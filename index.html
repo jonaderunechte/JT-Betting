@@ -8,41 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-<!-- ═══════════════════════════════════════════════════
-     FIREBASE CONFIG — HIER DEINE EIGENEN WERTE EINTRAGEN
-     Schritt 4 in der Anleitung erklärt wie du diese bekommst
-     ═══════════════════════════════════════════════════ -->
-<script type="module">
-  import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getFirestore, collection, doc, getDoc, getDocs,
-    setDoc, addDoc, updateDoc, deleteDoc,
-    onSnapshot, serverTimestamp, query, orderBy, Timestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  // ▼▼▼ DEINE FIREBASE-KONFIGURATION HIER EINTRAGEN ▼▼▼
-  const firebaseConfig = {
-  apiKey: "AIzaSyBbtNRoUiuuKrJBO9ulPNVNCo_h1woEF_A",
-  authDomain: "jt-betting.firebaseapp.com",
-  projectId: "jt-betting",
-  storageBucket: "jt-betting.firebasestorage.app",
-  messagingSenderId: "175871107945",
-  appId: "1:175871107945:web:d8a2cc669da103d6d093f8"
-};
-  // ▲▲▲ ENDE DER KONFIGURATION ▲▲▲
-
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
-
-  window._fb = {
-    db, collection, doc, getDoc, getDocs,
-    setDoc, addDoc, updateDoc, deleteDoc,
-    onSnapshot, serverTimestamp, query, orderBy, Timestamp
-  };
-  window.dispatchEvent(new Event('firebase-ready'));
-</script>
-
 <style>
   :root {
     --bg:#0a0a0f; --surface:#12121a; --surface2:#1a1a26;
@@ -57,16 +22,12 @@
     background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(123,97,255,.06) 0%,transparent 60%),
                radial-gradient(ellipse 50% 30% at 90% 80%,rgba(0,255,136,.04) 0%,transparent 60%);
     pointer-events:none;z-index:0;}
-
-  /* ── LOADING ── */
   #loading-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2000;background:var(--bg);gap:24px;}
   .loading-logo{font-family:'Bebas Neue',cursive;font-size:80px;letter-spacing:10px;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
   .loading-bar-wrap{width:200px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
   .loading-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent3),var(--accent));animation:loadBar 1.5s ease-in-out infinite;}
   @keyframes loadBar{0%{width:0;margin-left:0}50%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}
   .loading-status{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;}
-
-  /* ── AUTH ── */
   #auth-screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1000;background:var(--bg);}
   .auth-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:48px;width:420px;position:relative;overflow:hidden;}
   .auth-box::before{content:'';position:absolute;top:-1px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
@@ -82,11 +43,7 @@
   .btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#00cc6a);color:#0a0a0f;font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;transition:all .2s;font-family:'Space Mono',monospace;margin-top:8px;}
   .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,255,136,.25);}
   .auth-error{color:var(--accent2);font-size:12px;text-align:center;margin-top:12px;font-family:'Space Mono',monospace;min-height:18px;}
-
-  /* ── APP ── */
   #app{display:none;position:relative;z-index:1;min-height:100vh;}
-
-  /* ── HEADER ── */
   header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;}
   .header-logo{font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
   .header-right{display:flex;align-items:center;gap:16px;}
@@ -99,8 +56,6 @@
   .user-name{font-size:13px;font-weight:500;}
   .logout-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 12px;cursor:pointer;font-size:12px;font-family:'Space Mono',monospace;transition:all .2s;}
   .logout-btn:hover{border-color:var(--accent2);color:var(--accent2);}
-
-  /* ── MAIN ── */
   main{max-width:900px;margin:0 auto;padding:32px 24px;}
   .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}
   .page-title{font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:2px;}
@@ -108,8 +63,6 @@
   .btn-new{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--accent),#00cc6a);color:#0a0a0f;border:none;border-radius:10px;padding:12px 22px;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;}
   .btn-new:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,255,136,.3);}
   .btn-new-icon{width:22px;height:22px;background:rgba(0,0,0,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
-
-  /* ── BET CARDS ── */
   .bets-list{display:flex;flex-direction:column;gap:12px;}
   .bet-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
   .bet-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent3));border-radius:3px 0 0 3px;opacity:0;transition:opacity .25s;}
@@ -137,8 +90,6 @@
   .bet-bar-labels{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;font-family:'Space Mono',monospace;}
   .yes-pct{color:var(--yes);font-weight:700;}
   .no-pct{color:var(--no);font-weight:700;}
-
-  /* ── MODALS ── */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px);}
   .modal-overlay.open{opacity:1;pointer-events:all;}
   .create-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:560px;position:relative;transform:translateY(20px);transition:transform .3s;max-height:90vh;overflow-y:auto;}
@@ -154,8 +105,6 @@
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   .form-note{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:6px;}
   .modal-error{color:var(--accent2);font-size:12px;text-align:center;font-family:'Space Mono',monospace;min-height:18px;margin-top:8px;}
-
-  /* ── DETAIL MODAL ── */
   .detail-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;position:relative;transform:translateY(20px);transition:transform .3s;}
   .detail-header{padding:32px 32px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
   .detail-question{font-size:18px;font-weight:600;line-height:1.4;flex:1;}
@@ -188,7 +137,6 @@
   .split-bar-no{height:100%;background:var(--no);transition:width .5s;}
   .btn-place{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#00cc6a);color:#0a0a0f;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:10px;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;}
   .btn-place:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,255,136,.25);}
-  .btn-place:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
   .bet-info-rows{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
   .info-row{display:flex;justify-content:space-between;font-size:12px;}
   .info-row .key{color:var(--muted);font-family:'Space Mono',monospace;}
@@ -204,24 +152,18 @@
   .resolve-no:hover{background:rgba(255,51,102,.1);}
   .btn-delete{width:100%;padding:10px;background:transparent;border:1px solid rgba(255,51,102,.3);color:var(--accent2);border-radius:8px;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;transition:all .2s;margin-top:10px;}
   .btn-delete:hover{background:rgba(255,51,102,.1);border-color:var(--accent2);}
-
-  /* ── EMPTY ── */
   .empty-state{text-align:center;padding:80px 24px;color:var(--muted);}
   .empty-icon{font-size:48px;margin-bottom:16px;}
   .empty-title{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;margin-bottom:8px;color:var(--text);}
   .empty-sub{font-size:14px;font-family:'Space Mono',monospace;}
-
-  /* ── TOAST ── */
   .toast{position:fixed;bottom:32px;right:32px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px;font-size:13px;font-family:'Space Mono',monospace;z-index:500;transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1);max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,.4);}
   .toast.show{transform:translateY(0);opacity:1;}
   .toast.success{border-left:3px solid var(--accent);}
   .toast.error{border-left:3px solid var(--accent2);}
   .toast.info{border-left:3px solid var(--accent3);}
-
   ::-webkit-scrollbar{width:6px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
-
   @media(max-width:640px){
     .detail-body{grid-template-columns:1fr;}
     .detail-charts{border-right:none;border-bottom:1px solid var(--border);}
@@ -234,14 +176,12 @@
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading-screen">
   <div class="loading-logo">JT</div>
   <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
   <div class="loading-status" id="loading-status">Verbinde mit Firebase...</div>
 </div>
 
-<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">JT</div>
@@ -264,7 +204,6 @@
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <header>
     <div class="header-logo">JT</div>
@@ -297,7 +236,6 @@
   </main>
 </div>
 
-<!-- CREATE MODAL -->
 <div class="modal-overlay" id="create-overlay" onclick="closeOnOverlay(event,'create-overlay')">
   <div class="create-modal">
     <div class="modal-header">
@@ -325,7 +263,6 @@
   </div>
 </div>
 
-<!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detail-overlay" onclick="closeOnOverlay(event,'detail-overlay')">
   <div class="detail-modal">
     <div class="detail-header">
@@ -355,7 +292,7 @@
           <div class="sidebar-label">Deine Stimme</div>
           <div class="vote-selector">
             <button class="vote-btn yes" onclick="selectVote('yes')">JA</button>
-            <button class="vote-btn no"  onclick="selectVote('no')">NEIN</button>
+            <button class="vote-btn no" onclick="selectVote('no')">NEIN</button>
           </div>
           <div class="amount-input-wrap">
             <input type="number" id="bet-amount" placeholder="Einsatz..." min="1" oninput="updatePayout()">
@@ -368,11 +305,11 @@
           <div class="sidebar-label">Aktuell</div>
           <div class="current-split">
             <span class="split-yes" id="det-yes-pct">JA 50%</span>
-            <span class="split-no"  id="det-no-pct">NEIN 50%</span>
+            <span class="split-no" id="det-no-pct">NEIN 50%</span>
           </div>
           <div class="split-bar">
             <div class="split-bar-yes" id="det-split-yes" style="width:50%"></div>
-            <div class="split-bar-no"  id="det-split-no"  style="width:50%"></div>
+            <div class="split-bar-no" id="det-split-no" style="width:50%"></div>
           </div>
           <button class="btn-place" onclick="placeBet()">Wette platzieren</button>
           <div class="modal-error" id="bet-error"></div>
@@ -382,7 +319,7 @@
             <div class="resolve-title">Ergebnis festlegen</div>
             <div class="resolve-btns">
               <button class="resolve-btn resolve-yes" onclick="resolveBet('yes')">✓ JA</button>
-              <button class="resolve-btn resolve-no"  onclick="resolveBet('no')">✗ NEIN</button>
+              <button class="resolve-btn resolve-no" onclick="resolveBet('no')">✗ NEIN</button>
             </div>
           </div>
         </div>
@@ -399,547 +336,420 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- ══════════════════════════════════════════════════
-     JAVASCRIPT — FIRESTORE
-══════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════
+  EINZIGER script type="module" — kein Race Condition
+══════════════════════════════════════════════ -->
 <script type="module">
 
-let db, fsCollection, fsDoc, fsGetDoc, fsGetDocs,
-    fsSetDoc, fsAddDoc, fsUpdateDoc, fsDeleteDoc,
-    fsOnSnapshot, fsQuery, fsOrderBy;
+// ════════════════════════════════════════════
+// ▼▼▼  FIREBASE-KONFIGURATION EINTRAGEN  ▼▼▼
+// ════════════════════════════════════════════
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, getDoc,
+  setDoc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let currentUser  = null;
+const firebaseConfig = {
+  apiKey: "AIzaSyBbtNRoUiuuKrJBO9ulPNVNCo_h1woEF_A",
+  authDomain: "jt-betting.firebaseapp.com",
+  projectId: "jt-betting",
+  storageBucket: "jt-betting.firebasestorage.app",
+  messagingSenderId: "175871107945",
+  appId: "1:175871107945:web:d8a2cc669da103d6d093f8"
+};
+// ════════════════════════════════════════════
+// ▲▲▲  ENDE KONFIGURATION               ▲▲▲
+// ════════════════════════════════════════════
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+let currentUser        = null;
 let currentDetailBetId = null;
-let selectedVote = null;
-let volumeChart  = null;
-let splitChart   = null;
-let betsUnsub    = null;
-let allBets      = [];
+let selectedVote       = null;
+let volumeChart        = null;
+let splitChart         = null;
+let betsUnsub          = null;
+let allBets            = [];
 
-// ─── Wait for Firebase ───────────────────────────
-window.addEventListener('firebase-ready', init);
-
-async function init() {
-  const fb = window._fb;
-  db           = fb.db;
-  fsCollection = fb.collection;
-  fsDoc        = fb.doc;
-  fsGetDoc     = fb.getDoc;
-  fsGetDocs    = fb.getDocs;
-  fsSetDoc     = fb.setDoc;
-  fsAddDoc     = fb.addDoc;
-  fsUpdateDoc  = fb.updateDoc;
-  fsDeleteDoc  = fb.deleteDoc;
-  fsOnSnapshot = fb.onSnapshot;
-  fsQuery      = fb.query;
-  fsOrderBy    = fb.orderBy;
-
-  setStatus('Firebase verbunden ✓');
-
+// ── Boot (top-level await in module) ──────────
+setStatus('Firebase verbunden ✓');
+try {
   const saved = sessionStorage.getItem('jt_user');
   if (saved) {
-    const snap = await fsGetDoc(fsDoc(db, 'users', saved));
+    const snap = await getDoc(doc(db, 'users', saved));
     if (snap.exists()) {
       currentUser = saved;
       hideLoading();
       enterApp();
-      return;
+    } else {
+      sessionStorage.removeItem('jt_user');
+      showAuth();
     }
+  } else {
+    showAuth();
   }
-  hideLoading();
-  document.getElementById('auth-screen').style.display = 'flex';
+} catch(e) {
+  setStatus('Verbindungsfehler: ' + e.message);
 }
 
+// ── Hilfsfunktionen ───────────────────────────
 function setStatus(m){ document.getElementById('loading-status').textContent = m; }
 function hideLoading(){ document.getElementById('loading-screen').style.display = 'none'; }
+function showAuth(){ hideLoading(); document.getElementById('auth-screen').style.display = 'flex'; }
+function showEl(id){ document.getElementById(id).style.display = 'block'; }
+function hideEl(id){ document.getElementById(id).style.display = 'none'; }
+function setTxt(id,t){ document.getElementById(id).textContent = t; }
 
-// ─── HELPERS ─────────────────────────────────────
-function fmtBalance(n){ return (Math.round(n*100)/100).toFixed(2)+'€'; }
+function fmtMoney(n){ return (Math.round(n*100)/100).toFixed(2)+'€'; }
 function todayStr(){ return new Date().toISOString().slice(0,10); }
-function fmtDate(ms){
-  return new Date(ms).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-}
-function fmtDateShort(ms){
-  const d=new Date(ms);
-  return `${d.getDate()}.${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-function escHtml(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function toLocalInput(d){
-  const p=n=>String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
-}
+function fmtDate(ms){ return new Date(ms).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function fmtShort(ms){ const d=new Date(ms); return `${d.getDate()}.${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toInput(d){ const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
 
-let toastTimer=null;
-window.showToast = function(msg,type='info'){
+let _toastTimer=null;
+function toast(msg,type='info'){
   const t=document.getElementById('toast');
-  t.className=`toast ${type}`;
-  t.innerHTML=`<span>${msg}</span>`;
-  clearTimeout(toastTimer);
-  void t.offsetWidth;
-  t.classList.add('show');
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+  t.className=`toast ${type}`; t.innerHTML=`<span>${msg}</span>`;
+  clearTimeout(_toastTimer); void t.offsetWidth; t.classList.add('show');
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-// ─── AUTH ─────────────────────────────────────────
+// ── Auth ──────────────────────────────────────
 window.switchAuthTab = function(tab){
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>{
-    t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register'));
-  });
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
   document.getElementById('login-form').style.display    = tab==='login'   ?'':'none';
   document.getElementById('register-form').style.display = tab==='register'?'':'none';
   document.getElementById('auth-error').textContent='';
-}
+};
 
 window.register = async function(){
-  const u   = document.getElementById('reg-user').value.trim();
-  const p   = document.getElementById('reg-pass').value;
-  const err = document.getElementById('auth-error');
-  if (!u||u.length<2)             { err.textContent='Benutzername zu kurz (min. 2 Zeichen)'; return; }
-  if (!p||p.length<4)             { err.textContent='Passwort zu kurz (min. 4 Zeichen)'; return; }
-  if (!/^[a-zA-Z0-9_-]+$/.test(u)){ err.textContent='Nur Buchstaben, Zahlen, _ und - erlaubt'; return; }
-  try {
-    const snap = await fsGetDoc(fsDoc(db,'users',u));
-    if (snap.exists()){ err.textContent='Benutzername bereits vergeben'; return; }
-    await fsSetDoc(fsDoc(db,'users',u),{ password:p, balance:100, betsMadeToday:0, lastBetDate:'' });
-    err.style.color='var(--accent)';
-    err.textContent='Account erstellt! Du kannst dich jetzt einloggen.';
-    setTimeout(()=>{ err.textContent=''; err.style.color=''; switchAuthTab('login'); },1500);
-  } catch(e){ err.textContent='Fehler: '+e.message; }
-}
+  const u=document.getElementById('reg-user').value.trim();
+  const p=document.getElementById('reg-pass').value;
+  const err=document.getElementById('auth-error');
+  if(!u||u.length<2)             {err.textContent='Benutzername zu kurz';return;}
+  if(!p||p.length<4)             {err.textContent='Passwort zu kurz (min. 4 Zeichen)';return;}
+  if(!/^[a-zA-Z0-9_-]+$/.test(u)){err.textContent='Nur Buchstaben, Zahlen, _ und - erlaubt';return;}
+  try{
+    if((await getDoc(doc(db,'users',u))).exists()){err.textContent='Benutzername bereits vergeben';return;}
+    await setDoc(doc(db,'users',u),{password:p,balance:100,betsMadeToday:0,lastBetDate:''});
+    err.style.color='var(--accent)'; err.textContent='Account erstellt! Jetzt einloggen.';
+    setTimeout(()=>{err.textContent='';err.style.color='';switchAuthTab('login');},1500);
+  }catch(e){err.textContent='Fehler: '+e.message;}
+};
 
 window.login = async function(){
-  const u   = document.getElementById('login-user').value.trim();
-  const p   = document.getElementById('login-pass').value;
-  const err = document.getElementById('auth-error');
-  if(!u||!p){ err.textContent='Bitte alle Felder ausfüllen'; return; }
-  try {
-    const snap = await fsGetDoc(fsDoc(db,'users',u));
-    if(!snap.exists()||snap.data().password!==p){ err.textContent='Falscher Benutzername oder Passwort'; return; }
-    currentUser = u;
-    sessionStorage.setItem('jt_user',u);
-    document.getElementById('auth-screen').style.display='none';
-    enterApp();
-  } catch(e){ err.textContent='Fehler: '+e.message; }
-}
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value;
+  const err=document.getElementById('auth-error');
+  if(!u||!p){err.textContent='Bitte alle Felder ausfüllen';return;}
+  try{
+    const snap=await getDoc(doc(db,'users',u));
+    if(!snap.exists()||snap.data().password!==p){err.textContent='Falscher Benutzername oder Passwort';return;}
+    currentUser=u; sessionStorage.setItem('jt_user',u);
+    hideEl('auth-screen'); enterApp();
+  }catch(e){err.textContent='Fehler: '+e.message;}
+};
 
 window.logout = function(){
-  currentUser=null;
-  sessionStorage.removeItem('jt_user');
-  if(betsUnsub){ betsUnsub(); betsUnsub=null; }
-  document.getElementById('app').style.display='none';
-  document.getElementById('auth-screen').style.display='flex';
-}
+  currentUser=null; sessionStorage.removeItem('jt_user');
+  if(betsUnsub){betsUnsub();betsUnsub=null;}
+  hideEl('app'); document.getElementById('auth-screen').style.display='flex';
+};
 
-// ─── APP ──────────────────────────────────────────
+// ── App ───────────────────────────────────────
 function enterApp(){
   document.getElementById('app').style.display='block';
-  updateHeader();
-  subscribeToData();
-  setInterval(autoDeleteExpired, 5*60*1000);
+  updateHeader(); subscribeToData();
+  setInterval(autoDeleteExpired,5*60*1000);
 }
 
 async function updateHeader(){
-  const snap = await fsGetDoc(fsDoc(db,'users',currentUser));
-  if(!snap.exists()) return;
-  const u = snap.data();
-  document.getElementById('header-username').textContent  = currentUser;
-  document.getElementById('header-avatar').textContent    = currentUser.charAt(0).toUpperCase();
-  document.getElementById('header-balance').textContent   = fmtBalance(u.balance);
+  try{
+    const snap=await getDoc(doc(db,'users',currentUser));
+    if(!snap.exists())return;
+    const u=snap.data();
+    setTxt('header-username',currentUser);
+    setTxt('header-avatar',currentUser.charAt(0).toUpperCase());
+    setTxt('header-balance',fmtMoney(u.balance));
+  }catch(e){console.warn(e);}
 }
 
-// ─── REALTIME LISTENER ────────────────────────────
 function subscribeToData(){
-  const q = fsQuery(fsCollection(db,'bets'), fsOrderBy('createdAt','desc'));
-  betsUnsub = fsOnSnapshot(q, snap=>{
-    allBets = snap.docs.map(d=>({...d.data(), id:d.id}));
+  const q=query(collection(db,'bets'),orderBy('createdAt','desc'));
+  betsUnsub=onSnapshot(q,snap=>{
+    allBets=snap.docs.map(d=>({...d.data(),id:d.id}));
     allBets.sort((a,b)=>{
-      const order={open:0,closed:1,ended:2,resolved:3};
-      const sa=getBetStatus(a), sb=getBetStatus(b);
-      if(order[sa]!==order[sb]) return order[sa]-order[sb];
-      return b.createdAt - a.createdAt;
+      const o={open:0,closed:1,ended:2,resolved:3};
+      const sa=status(a),sb=status(b);
+      return o[sa]!==o[sb]?o[sa]-o[sb]:b.createdAt-a.createdAt;
     });
-    renderBets();
-    updateHeader();
-    autoDeleteExpired();
-  });
+    renderBets(); updateHeader(); autoDeleteExpired();
+  },e=>console.error('Snapshot:',e));
 }
 
-// ─── AUTO CLEANUP (resolved + 24h) ───────────────
 async function autoDeleteExpired(){
-  const now = Date.now();
+  const now=Date.now();
   for(const bet of allBets){
-    if(bet.resolved && bet.resolvedAt && (now - bet.resolvedAt) > 24*60*60*1000){
-      await fsDeleteDoc(fsDoc(db,'bets',bet.id));
+    if(bet.resolved&&bet.resolvedAt&&(now-bet.resolvedAt)>86400000){
+      try{await deleteDoc(doc(db,'bets',bet.id));}catch(e){}
     }
   }
 }
 
-// ─── STATUS ──────────────────────────────────────
-function getBetStatus(bet){
+function status(bet){
   const now=Date.now();
-  if(bet.resolved)       return 'resolved';
-  if(now>bet.endDate)    return 'ended';
-  if(now>bet.closeDate)  return 'closed';
+  if(bet.resolved)return 'resolved';
+  if(now>bet.endDate)return 'ended';
+  if(now>bet.closeDate)return 'closed';
   return 'open';
 }
 
-// ─── RENDER ──────────────────────────────────────
+// ── Render ────────────────────────────────────
 function renderBets(){
-  const list = document.getElementById('bets-list');
+  const list=document.getElementById('bets-list');
   if(!allBets.length){
-    list.innerHTML=`<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Noch keine Wetten</div><div class="empty-sub">Erstelle die erste Wette!</div></div>`;
-    document.getElementById('bets-count').textContent='0 aktive Wetten';
-    return;
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Noch keine Wetten</div><div class="empty-sub">Erstelle die erste Wette!</div></div>';
+    setTxt('bets-count','0 aktive Wetten'); return;
   }
-  const active=allBets.filter(b=>getBetStatus(b)==='open').length;
-  document.getElementById('bets-count').textContent=`${active} offen · ${allBets.length} gesamt`;
-
-  list.innerHTML = allBets.map(bet=>{
-    const status = getBetStatus(bet);
-    const total  = (bet.stakeYes||0)+(bet.stakeNo||0);
-    const yesPct = total>0?Math.round((bet.stakeYes||0)/total*100):50;
-    const noPct  = 100-yesPct;
-    const isMine = bet.creator===currentUser;
-    const participants = bet.participants||{};
-    const alreadyBet = Object.values(participants).some(p=>p.user===currentUser);
-
-    const statusBadge={
-      open:    '<span class="badge badge-open">🟢 Offen</span>',
-      closed:  '<span class="badge badge-closed">🔴 Annahme zu</span>',
-      ended:   '<span class="badge badge-ended">⏱ Beendet</span>',
-      resolved:`<span class="badge badge-resolved">✓ ${bet.winner==='yes'?'JA gewann':'NEIN gewann'}</span>`
-    }[status];
-
-    let deleteNote='';
-    if(status==='resolved'&&bet.resolvedAt){
-      const h=Math.ceil((bet.resolvedAt+24*60*60*1000-Date.now())/(60*60*1000));
-      if(h>0) deleteNote=`<div class="meta-item"><span class="meta-icon">🗑</span><span>Wird in ~${h}h entfernt</span></div>`;
-    }
-
-    return `<div class="bet-card ${isMine?'mine':''} ${status==='resolved'?'resolved-card':''}" onclick="openDetailModal('${bet.id}')">
-      <div class="bet-card-top">
-        <div class="bet-question">${escHtml(bet.question)}</div>
-        <div class="bet-badges">
-          ${statusBadge}
-          ${isMine?'<span class="badge badge-mine">⚙ Meine</span>':''}
-          ${alreadyBet&&!isMine?'<span class="badge badge-mine" style="background:rgba(0,255,136,.08);color:var(--accent);border-color:rgba(0,255,136,.2)">✓ Gewettet</span>':''}
-        </div>
+  const active=allBets.filter(b=>status(b)==='open').length;
+  setTxt('bets-count',`${active} offen · ${allBets.length} gesamt`);
+  list.innerHTML=allBets.map(bet=>{
+    const st=status(bet),total=(bet.stakeYes||0)+(bet.stakeNo||0);
+    const yp=total>0?Math.round((bet.stakeYes||0)/total*100):50,np=100-yp;
+    const isMine=bet.creator===currentUser;
+    const parts=bet.participants?Object.values(bet.participants):[];
+    const didBet=parts.some(p=>p.user===currentUser);
+    const sb={open:'<span class="badge badge-open">🟢 Offen</span>',closed:'<span class="badge badge-closed">🔴 Annahme zu</span>',ended:'<span class="badge badge-ended">⏱ Beendet</span>',resolved:`<span class="badge badge-resolved">✓ ${bet.winner==='yes'?'JA gewann':'NEIN gewann'}</span>`}[st];
+    let dn='';
+    if(st==='resolved'&&bet.resolvedAt){const h=Math.ceil((bet.resolvedAt+86400000-Date.now())/3600000);if(h>0)dn=`<div class="meta-item"><span class="meta-icon">🗑</span><span>Wird in ~${h}h entfernt</span></div>`;}
+    return `<div class="bet-card ${isMine?'mine':''} ${st==='resolved'?'resolved-card':''}" onclick="openDetailModal('${bet.id}')">
+      <div class="bet-card-top"><div class="bet-question">${esc(bet.question)}</div>
+        <div class="bet-badges">${sb}${isMine?'<span class="badge badge-mine">⚙ Meine</span>':''}${didBet&&!isMine?'<span class="badge badge-mine" style="background:rgba(0,255,136,.08);color:var(--accent);border-color:rgba(0,255,136,.2)">✓ Gewettet</span>':''}</div>
       </div>
       <div class="bet-meta">
-        <div class="meta-item"><span class="meta-icon">👤</span><span>${escHtml(bet.creator)}</span></div>
-        <div class="meta-item"><span class="meta-icon">💰</span><span class="meta-value">${fmtBalance(total)}</span> Gesamt</div>
+        <div class="meta-item"><span class="meta-icon">👤</span><span>${esc(bet.creator)}</span></div>
+        <div class="meta-item"><span class="meta-icon">💰</span><span class="meta-value">${fmtMoney(total)}</span> Gesamt</div>
         <div class="meta-item"><span class="meta-icon">📅</span><span>Annahme: <span class="meta-value">${fmtDate(bet.closeDate)}</span></span></div>
         <div class="meta-item"><span class="meta-icon">🏁</span><span>Ende: <span class="meta-value">${fmtDate(bet.endDate)}</span></span></div>
-        ${deleteNote}
+        ${dn}
       </div>
       <div class="bet-bar-wrap">
-        <div class="bet-bar">
-          <div class="bet-bar-yes" style="width:${yesPct}%"></div>
-          <div class="bet-bar-no"  style="width:${noPct}%"></div>
-        </div>
-        <div class="bet-bar-labels">
-          <span class="yes-pct">JA ${yesPct}%</span>
-          <span class="no-pct">NEIN ${noPct}%</span>
-        </div>
-      </div>
-    </div>`;
+        <div class="bet-bar"><div class="bet-bar-yes" style="width:${yp}%"></div><div class="bet-bar-no" style="width:${np}%"></div></div>
+        <div class="bet-bar-labels"><span class="yes-pct">JA ${yp}%</span><span class="no-pct">NEIN ${np}%</span></div>
+      </div></div>`;
   }).join('');
 }
 
-// ─── CREATE BET ───────────────────────────────────
+// ── Create Bet ────────────────────────────────
 window.openCreateModal = async function(){
-  const snap = await fsGetDoc(fsDoc(db,'users',currentUser));
-  const u = snap.data();
-  const today = todayStr();
-  if(u.lastBetDate!==today){
-    await fsUpdateDoc(fsDoc(db,'users',currentUser),{betsMadeToday:0,lastBetDate:today});
-    u.betsMadeToday=0;
-  }
-  if(u.betsMadeToday>=2){ showToast('Du hast heute bereits 2 Wetten eröffnet!','error'); return; }
-  const now=new Date();
-  const minClose=new Date(now.getTime()+24*60*60*1000);
-  const minEnd=new Date(minClose.getTime()+60*60*1000);
-  document.getElementById('new-bet-close').value=toLocalInput(minClose);
-  document.getElementById('new-bet-end').value=toLocalInput(minEnd);
+  try{
+    const snap=await getDoc(doc(db,'users',currentUser));
+    const u=snap.data(),today=todayStr();
+    if(u.lastBetDate!==today){await updateDoc(doc(db,'users',currentUser),{betsMadeToday:0,lastBetDate:today});u.betsMadeToday=0;}
+    if(u.betsMadeToday>=2){toast('Du hast heute bereits 2 Wetten eröffnet!','error');return;}
+  }catch(e){toast('Fehler: '+e.message,'error');return;}
+  const now=new Date(),mc=new Date(now.getTime()+86400000),me=new Date(mc.getTime()+3600000);
+  document.getElementById('new-bet-close').value=toInput(mc);
+  document.getElementById('new-bet-end').value=toInput(me);
   document.getElementById('new-question').value='';
   document.getElementById('create-error').textContent='';
   document.getElementById('create-overlay').classList.add('open');
-}
+};
 
-window.closeCreateModal = function(){
-  document.getElementById('create-overlay').classList.remove('open');
-}
+window.closeCreateModal = function(){ document.getElementById('create-overlay').classList.remove('open'); };
 
 window.createBet = async function(){
-  const q        = document.getElementById('new-question').value.trim();
-  const closeStr = document.getElementById('new-bet-close').value;
-  const endStr   = document.getElementById('new-bet-end').value;
-  const err      = document.getElementById('create-error');
-  if(!q)          { err.textContent='Bitte eine Frage eingeben'; return; }
-  if(!closeStr||!endStr){ err.textContent='Bitte alle Daten ausfüllen'; return; }
-  const now=Date.now();
-  const closeDate=new Date(closeStr).getTime();
-  const endDate=new Date(endStr).getTime();
-  if(closeDate<now+23*60*60*1000){ err.textContent='Annahmeschluss muss mindestens 1 Tag in der Zukunft liegen'; return; }
-  if(endDate<=closeDate)         { err.textContent='Enddatum muss nach dem Annahmeschluss liegen'; return; }
+  const q=document.getElementById('new-question').value.trim();
+  const cs=document.getElementById('new-bet-close').value;
+  const es=document.getElementById('new-bet-end').value;
+  const err=document.getElementById('create-error');
+  if(!q){err.textContent='Bitte eine Frage eingeben';return;}
+  if(!cs||!es){err.textContent='Bitte alle Daten ausfüllen';return;}
+  const now=Date.now(),cd=new Date(cs).getTime(),ed=new Date(es).getTime();
+  if(cd<now+82800000){err.textContent='Annahmeschluss muss mindestens 1 Tag in der Zukunft liegen';return;}
+  if(ed<=cd){err.textContent='Enddatum muss nach dem Annahmeschluss liegen';return;}
+  try{
+    const snap=await getDoc(doc(db,'users',currentUser));
+    const u=snap.data(),today=todayStr();
+    const made=u.lastBetDate===today?u.betsMadeToday:0;
+    if(made>=2){err.textContent='Tageslimit (2 Wetten) erreicht';return;}
+    await addDoc(collection(db,'bets'),{
+      question:q,creator:currentUser,createdAt:now,
+      closeDate:cd,endDate:ed,resolved:false,winner:null,
+      stakeYes:0,stakeNo:0,participants:{},
+      history:{[String(now)]:{yesTotal:0,noTotal:0}}
+    });
+    await updateDoc(doc(db,'users',currentUser),{betsMadeToday:made+1,lastBetDate:today});
+    closeCreateModal(); toast('Wette eröffnet! 🎯','success');
+  }catch(e){err.textContent='Fehler: '+e.message;}
+};
 
-  const snap=await fsGetDoc(fsDoc(db,'users',currentUser));
-  const u=snap.data();
-  const today=todayStr();
-  const made=u.lastBetDate===today?u.betsMadeToday:0;
-  if(made>=2){ err.textContent='Tageslimit (2 Wetten) erreicht'; return; }
-
-  await fsAddDoc(fsCollection(db,'bets'),{
-    question:q, creator:currentUser, createdAt:now,
-    closeDate, endDate, resolved:false, winner:null,
-    stakeYes:0, stakeNo:0,
-    participants:{},
-    history:{ [String(now)]:{yesTotal:0,noTotal:0} }
-  });
-  await fsUpdateDoc(fsDoc(db,'users',currentUser),{ betsMadeToday:made+1, lastBetDate:today });
-  closeCreateModal();
-  showToast('Wette eröffnet! 🎯','success');
-}
-
-// ─── DETAIL MODAL ────────────────────────────────
+// ── Detail Modal ──────────────────────────────
 window.openDetailModal = function(id){
-  currentDetailBetId=id;
-  selectedVote=null;
+  currentDetailBetId=id; selectedVote=null;
   const bet=allBets.find(b=>b.id===id);
-  if(!bet) return;
-
-  const status=getBetStatus(bet);
-  const total=(bet.stakeYes||0)+(bet.stakeNo||0);
-  const yesPct=total>0?Math.round((bet.stakeYes||0)/total*100):50;
-  const noPct=100-yesPct;
+  if(!bet)return;
+  const st=status(bet),total=(bet.stakeYes||0)+(bet.stakeNo||0);
+  const yp=total>0?Math.round((bet.stakeYes||0)/total*100):50,np=100-yp;
   const isMine=bet.creator===currentUser;
-  const participants=bet.participants?Object.values(bet.participants):[];
-  const alreadyBet=participants.some(p=>p.user===currentUser);
-  const myBet=participants.find(p=>p.user===currentUser);
+  const parts=bet.participants?Object.values(bet.participants):[];
+  const didBet=parts.some(p=>p.user===currentUser);
+  const myBet=parts.find(p=>p.user===currentUser);
 
-  document.getElementById('det-question').textContent=bet.question;
-  const badgesEl=document.getElementById('det-badges');
-  badgesEl.innerHTML='';
+  setTxt('det-question',bet.question);
+  const be=document.getElementById('det-badges'); be.innerHTML='';
   const sb=document.createElement('span');
-  sb.className=`badge badge-${status==='resolved'?'resolved':status}`;
-  sb.textContent={open:'🟢 Offen',closed:'🔴 Annahme geschlossen',ended:'⏱ Beendet',resolved:`✓ ${bet.winner==='yes'?'JA gewonnen':'NEIN gewonnen'}`}[status];
-  badgesEl.appendChild(sb);
-  if(isMine){const m=document.createElement('span');m.className='badge badge-mine';m.textContent='⚙ Meine Wette';badgesEl.appendChild(m);}
+  sb.className=`badge badge-${st==='resolved'?'resolved':st}`;
+  sb.textContent={open:'🟢 Offen',closed:'🔴 Annahme geschlossen',ended:'⏱ Beendet',resolved:`✓ ${bet.winner==='yes'?'JA gewonnen':'NEIN gewonnen'}`}[st];
+  be.appendChild(sb);
+  if(isMine){const m=document.createElement('span');m.className='badge badge-mine';m.textContent='⚙ Meine Wette';be.appendChild(m);}
 
   document.getElementById('det-info').innerHTML=`
-    <div class="info-row"><span class="key">Ersteller</span><span class="val">${escHtml(bet.creator)}</span></div>
+    <div class="info-row"><span class="key">Ersteller</span><span class="val">${esc(bet.creator)}</span></div>
     <div class="info-row"><span class="key">Annahme bis</span><span class="val">${fmtDate(bet.closeDate)}</span></div>
     <div class="info-row"><span class="key">Endet am</span><span class="val">${fmtDate(bet.endDate)}</span></div>
-    <div class="info-row"><span class="key">Gesamteinsatz</span><span class="val">${fmtBalance(total)}</span></div>
-    <div class="info-row"><span class="key">Teilnehmer</span><span class="val">${participants.length}</span></div>
+    <div class="info-row"><span class="key">Gesamteinsatz</span><span class="val">${fmtMoney(total)}</span></div>
+    <div class="info-row"><span class="key">Teilnehmer</span><span class="val">${parts.length}</span></div>
     ${bet.resolved?`<div class="info-row"><span class="key">Ergebnis</span><span class="val" style="color:${bet.winner==='yes'?'var(--yes)':'var(--no)'}">
     ${bet.winner==='yes'?'✓ JA':'✗ NEIN'}</span></div>`:''}`;
 
-  document.getElementById('det-yes-pct').textContent=`JA ${yesPct}%`;
-  document.getElementById('det-no-pct').textContent=`NEIN ${noPct}%`;
-  document.getElementById('det-split-yes').style.width=yesPct+'%';
-  document.getElementById('det-split-no').style.width=noPct+'%';
+  setTxt('det-yes-pct',`JA ${yp}%`); setTxt('det-no-pct',`NEIN ${np}%`);
+  document.getElementById('det-split-yes').style.width=yp+'%';
+  document.getElementById('det-split-no').style.width=np+'%';
   document.querySelectorAll('.vote-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('bet-amount').value='';
-  document.getElementById('payout-val').textContent='— €';
-  document.getElementById('bet-error').textContent='';
+  setTxt('payout-val','— €'); setTxt('bet-error','');
   document.getElementById('det-msg-text').style.color='';
+  ['det-vote-section','det-resolve-section','det-msg-section','det-delete-section'].forEach(hideEl);
 
-  ['det-vote-section','det-resolve-section','det-msg-section','det-delete-section'].forEach(x=>{
-    document.getElementById(x).style.display='none';
-  });
-
-  if(status==='open'){
-    if(isMine){
-      show('det-msg-section'); txt('Du kannst nicht auf deine eigene Wette wetten.');
-      show('det-delete-section');
-    } else if(alreadyBet){
-      show('det-msg-section');
-      txt(`Du hast bereits ${fmtBalance(myBet.amount)} auf "${myBet.side==='yes'?'JA':'NEIN'}" gesetzt.`);
-    } else {
-      show('det-vote-section');
-    }
-  } else if(status==='ended'&&isMine&&!bet.resolved){
-    show('det-resolve-section'); show('det-msg-section');
-    txt('Die Wette ist beendet. Lege das Ergebnis fest!');
-  } else if(status==='closed'){
-    show('det-msg-section'); txt('Annahmeschluss vorbei. Keine neuen Einsätze möglich.');
-    if(isMine) show('det-delete-section');
-  } else if(status==='ended'&&!isMine){
-    show('det-msg-section'); txt('Warte auf Entscheidung des Erstellers...');
-  } else if(status==='resolved'){
-    show('det-msg-section');
-    if(myBet){
-      const won=myBet.side===bet.winner;
-      txt(won?'🎉 Du hast gewonnen!':'Du hast leider verloren.');
-      document.getElementById('det-msg-text').style.color=won?'var(--yes)':'var(--no)';
-    } else { txt('Wette aufgelöst.'); }
+  if(st==='open'){
+    if(isMine){showEl('det-msg-section');setTxt('det-msg-text','Du kannst nicht auf deine eigene Wette wetten.');showEl('det-delete-section');}
+    else if(didBet){showEl('det-msg-section');setTxt('det-msg-text',`Du hast bereits ${fmtMoney(myBet.amount)} auf "${myBet.side==='yes'?'JA':'NEIN'}" gesetzt.`);}
+    else showEl('det-vote-section');
+  } else if(st==='ended'&&isMine&&!bet.resolved){
+    showEl('det-resolve-section');showEl('det-msg-section');setTxt('det-msg-text','Die Wette ist beendet. Lege das Ergebnis fest!');
+  } else if(st==='closed'){
+    showEl('det-msg-section');setTxt('det-msg-text','Annahmeschluss vorbei. Keine neuen Einsätze möglich.');
+    if(isMine)showEl('det-delete-section');
+  } else if(st==='ended'&&!isMine){
+    showEl('det-msg-section');setTxt('det-msg-text','Warte auf Entscheidung des Erstellers...');
+  } else if(st==='resolved'){
+    showEl('det-msg-section');
+    if(myBet){const won=myBet.side===bet.winner;setTxt('det-msg-text',won?'🎉 Du hast gewonnen!':'Du hast leider verloren.');document.getElementById('det-msg-text').style.color=won?'var(--yes)':'var(--no)';}
+    else setTxt('det-msg-text','Wette aufgelöst.');
   }
-
   buildCharts(bet);
   document.getElementById('detail-overlay').classList.add('open');
-}
-
-function show(id){ document.getElementById(id).style.display='block'; }
-function txt(t){ document.getElementById('det-msg-text').textContent=t; }
+};
 
 window.closeDetailModal = function(){
   document.getElementById('detail-overlay').classList.remove('open');
   if(volumeChart){volumeChart.destroy();volumeChart=null;}
-  if(splitChart) {splitChart.destroy(); splitChart=null;}
-}
+  if(splitChart){splitChart.destroy();splitChart=null;}
+};
 
-// ─── CHARTS ──────────────────────────────────────
+// ── Charts ────────────────────────────────────
 function buildCharts(bet){
   if(volumeChart){volumeChart.destroy();volumeChart=null;}
-  if(splitChart) {splitChart.destroy(); splitChart=null;}
-
-  const hist=bet.history
-    ? Object.entries(bet.history).sort((a,b)=>Number(a[0])-Number(b[0]))
-    : [[String(bet.createdAt),{yesTotal:0,noTotal:0}]];
-
-  const labels  = hist.map(([t])=>fmtDateShort(Number(t)));
-  const volumes = hist.map(([,h])=>(h.yesTotal||0)+(h.noTotal||0));
-  const yesPcts = hist.map(([,h])=>{const t=(h.yesTotal||0)+(h.noTotal||0);return t>0?Math.round((h.yesTotal||0)/t*100):50;});
-  const noPcts  = yesPcts.map(p=>100-p);
-
-  const base={responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#12121a',borderColor:'#2a2a3d',borderWidth:1,titleColor:'#e8e8f0',bodyColor:'#6b6b8a'}},
-    scales:{
-      x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6b6b8a',font:{family:'Space Mono',size:9},maxTicksLimit:6}},
-      y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6b6b8a',font:{family:'Space Mono',size:9}}}
-    }};
-
-  volumeChart=new Chart(document.getElementById('chart-volume').getContext('2d'),{
-    type:'line',
-    data:{labels,datasets:[{label:'Einsatz (€)',data:volumes,borderColor:'#7b61ff',backgroundColor:'rgba(123,97,255,.1)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#7b61ff'}]},
-    options:{...base}
-  });
-  splitChart=new Chart(document.getElementById('chart-split').getContext('2d'),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'JA %', data:yesPcts,borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.08)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#00ff88'},
-      {label:'NEIN %',data:noPcts, borderColor:'#ff3366',backgroundColor:'rgba(255,51,102,.08)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#ff3366'}
-    ]},
-    options:{...base,
-      plugins:{...base.plugins,legend:{display:true,labels:{color:'#6b6b8a',font:{family:'Space Mono',size:10}}}},
-      scales:{...base.scales,y:{...base.scales.y,min:0,max:100}}}
-  });
+  if(splitChart){splitChart.destroy();splitChart=null;}
+  const hist=bet.history?Object.entries(bet.history).sort((a,b)=>Number(a[0])-Number(b[0])):[[String(bet.createdAt),{yesTotal:0,noTotal:0}]];
+  const labels=hist.map(([t])=>fmtShort(Number(t)));
+  const vols=hist.map(([,h])=>(h.yesTotal||0)+(h.noTotal||0));
+  const yps=hist.map(([,h])=>{const t=(h.yesTotal||0)+(h.noTotal||0);return t>0?Math.round((h.yesTotal||0)/t*100):50;});
+  const nps=yps.map(p=>100-p);
+  const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#12121a',borderColor:'#2a2a3d',borderWidth:1,titleColor:'#e8e8f0',bodyColor:'#6b6b8a'}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6b6b8a',font:{family:'Space Mono',size:9},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6b6b8a',font:{family:'Space Mono',size:9}}}}};
+  volumeChart=new Chart(document.getElementById('chart-volume').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'€',data:vols,borderColor:'#7b61ff',backgroundColor:'rgba(123,97,255,.1)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#7b61ff'}]},options:{...base}});
+  splitChart=new Chart(document.getElementById('chart-split').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'JA %',data:yps,borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.08)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#00ff88'},{label:'NEIN %',data:nps,borderColor:'#ff3366',backgroundColor:'rgba(255,51,102,.08)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#ff3366'}]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{color:'#6b6b8a',font:{family:'Space Mono',size:10}}}},scales:{...base.scales,y:{...base.scales.y,min:0,max:100}}}});
 }
 
-// ─── PLACE BET ───────────────────────────────────
+// ── Bet ───────────────────────────────────────
 window.selectVote = function(side){
   selectedVote=side;
   document.querySelectorAll('.vote-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.vote-btn.${side}`).classList.add('active');
   updatePayout();
-}
-
-function calcPayout(bet,side,amount){
-  const yT=(bet.stakeYes||0)+(side==='yes'?amount:0);
-  const nT=(bet.stakeNo||0) +(side==='no' ?amount:0);
-  const total=yT+nT;
-  const st=side==='yes'?yT:nT;
-  return st>0?(total/st)*amount:amount;
-}
+};
 
 window.updatePayout = function(){
-  if(!currentDetailBetId||!selectedVote){document.getElementById('payout-val').textContent='— €';return;}
-  const amount=parseFloat(document.getElementById('bet-amount').value)||0;
-  if(amount<=0){document.getElementById('payout-val').textContent='— €';return;}
+  if(!currentDetailBetId||!selectedVote){setTxt('payout-val','— €');return;}
+  const amt=parseFloat(document.getElementById('bet-amount').value)||0;
+  if(amt<=0){setTxt('payout-val','— €');return;}
   const bet=allBets.find(b=>b.id===currentDetailBetId);
-  document.getElementById('payout-val').textContent=fmtBalance(calcPayout(bet,selectedVote,amount));
-}
+  const yT=(bet.stakeYes||0)+(selectedVote==='yes'?amt:0);
+  const nT=(bet.stakeNo||0)+(selectedVote==='no'?amt:0);
+  const tot=yT+nT,st=selectedVote==='yes'?yT:nT;
+  setTxt('payout-val',fmtMoney(st>0?(tot/st)*amt:amt));
+};
 
 window.placeBet = async function(){
   const err=document.getElementById('bet-error');
   if(!selectedVote){err.textContent='Bitte JA oder NEIN wählen';return;}
-  const amount=parseFloat(document.getElementById('bet-amount').value);
-  if(!amount||amount<1){err.textContent='Mindestens 1€ Einsatz';return;}
+  const amt=parseFloat(document.getElementById('bet-amount').value);
+  if(!amt||amt<1){err.textContent='Mindestens 1€ Einsatz';return;}
+  try{
+    const bet=allBets.find(b=>b.id===currentDetailBetId);
+    const snap=await getDoc(doc(db,'users',currentUser));
+    const u=snap.data();
+    if(amt>u.balance){err.textContent='Nicht genug Guthaben';return;}
+    const nb=Math.round((u.balance-amt)*100)/100;
+    const sf=selectedVote==='yes'?'stakeYes':'stakeNo';
+    const ns=Math.round(((bet[sf]||0)+amt)*100)/100;
+    const now=Date.now();
+    await updateDoc(doc(db,'users',currentUser),{balance:nb});
+    await updateDoc(doc(db,'bets',bet.id),{
+      [sf]:ns,
+      [`participants.${currentUser}`]:{user:currentUser,side:selectedVote,amount:amt,time:now},
+      [`history.${now}`]:{yesTotal:selectedVote==='yes'?ns:(bet.stakeYes||0),noTotal:selectedVote==='no'?ns:(bet.stakeNo||0)}
+    });
+    closeDetailModal(); toast(`${fmtMoney(amt)} auf "${selectedVote==='yes'?'JA':'NEIN'}" gesetzt! 🎯`,'success');
+  }catch(e){err.textContent='Fehler: '+e.message;}
+};
 
-  const bet=allBets.find(b=>b.id===currentDetailBetId);
-  const snap=await fsGetDoc(fsDoc(db,'users',currentUser));
-  const u=snap.data();
-  if(amount>u.balance){err.textContent='Nicht genug Guthaben';return;}
-
-  const newBal=Math.round((u.balance-amount)*100)/100;
-  const sf=selectedVote==='yes'?'stakeYes':'stakeNo';
-  const newStake=Math.round(((bet[sf]||0)+amount)*100)/100;
-  const now=Date.now();
-
-  await fsUpdateDoc(fsDoc(db,'users',currentUser),{balance:newBal});
-  await fsUpdateDoc(fsDoc(db,'bets',bet.id),{
-    [sf]: newStake,
-    [`participants.${currentUser}`]:{user:currentUser,side:selectedVote,amount,time:now},
-    [`history.${now}`]:{
-      yesTotal:selectedVote==='yes'?newStake:(bet.stakeYes||0),
-      noTotal: selectedVote==='no' ?newStake:(bet.stakeNo||0)
-    }
-  });
-
-  closeDetailModal();
-  showToast(`${fmtBalance(amount)} auf "${selectedVote==='yes'?'JA':'NEIN'}" gesetzt! 🎯`,'success');
-}
-
-// ─── RESOLVE ─────────────────────────────────────
+// ── Resolve ───────────────────────────────────
 window.resolveBet = async function(winner){
   const bet=allBets.find(b=>b.id===currentDetailBetId);
-  if(!bet||bet.resolved) return;
-
-  const stakeWin=winner==='yes'?(bet.stakeYes||0):(bet.stakeNo||0);
-  const total=(bet.stakeYes||0)+(bet.stakeNo||0);
-  const participants=bet.participants?Object.values(bet.participants):[];
-  const winners=participants.filter(p=>p.side===winner);
-  const now=Date.now();
-
-  await fsUpdateDoc(fsDoc(db,'bets',bet.id),{resolved:true,winner,resolvedAt:now});
-
-  if(winners.length===0){
-    for(const p of participants){
-      const s=await fsGetDoc(fsDoc(db,'users',p.user));
-      if(s.exists()) await fsUpdateDoc(fsDoc(db,'users',p.user),{balance:Math.round((s.data().balance+p.amount)*100)/100});
+  if(!bet||bet.resolved)return;
+  try{
+    const sw=winner==='yes'?(bet.stakeYes||0):(bet.stakeNo||0);
+    const tot=(bet.stakeYes||0)+(bet.stakeNo||0);
+    const parts=bet.participants?Object.values(bet.participants):[];
+    const winners=parts.filter(p=>p.side===winner);
+    await updateDoc(doc(db,'bets',bet.id),{resolved:true,winner,resolvedAt:Date.now()});
+    if(winners.length===0){
+      for(const p of parts){const s=await getDoc(doc(db,'users',p.user));if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+p.amount)*100)/100});}
+      toast('Keine Gewinner — Einsätze zurückerstattet.','info');
+    }else{
+      for(const p of winners){const po=sw>0?(tot/sw)*p.amount:p.amount;const s=await getDoc(doc(db,'users',p.user));if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+po)*100)/100});}
+      toast(`Wette aufgelöst! ${winner==='yes'?'JA':'NEIN'} gewinnt! 🎉`,'success');
     }
-    showToast('Keine Gewinner — Einsätze zurückerstattet.','info');
-  } else {
-    for(const p of winners){
-      const payout=stakeWin>0?(total/stakeWin)*p.amount:p.amount;
-      const s=await fsGetDoc(fsDoc(db,'users',p.user));
-      if(s.exists()) await fsUpdateDoc(fsDoc(db,'users',p.user),{balance:Math.round((s.data().balance+payout)*100)/100});
-    }
-    showToast(`Wette aufgelöst! ${winner==='yes'?'JA':'NEIN'} gewinnt! 🎉`,'success');
-  }
-  closeDetailModal();
-}
+    closeDetailModal();
+  }catch(e){toast('Fehler: '+e.message,'error');}
+};
 
-// ─── DELETE BET ──────────────────────────────────
+// ── Delete ────────────────────────────────────
 window.deleteBet = async function(){
   const bet=allBets.find(b=>b.id===currentDetailBetId);
-  if(!bet||bet.creator!==currentUser) return;
-  if(!confirm('Wette wirklich löschen? Alle Einsätze werden zurückerstattet.')) return;
+  if(!bet||bet.creator!==currentUser)return;
+  if(!confirm('Wette wirklich löschen? Alle Einsätze werden zurückerstattet.'))return;
+  try{
+    const parts=bet.participants?Object.values(bet.participants):[];
+    for(const p of parts){const s=await getDoc(doc(db,'users',p.user));if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+p.amount)*100)/100});}
+    await deleteDoc(doc(db,'bets',bet.id));
+    closeDetailModal(); toast('Wette gelöscht. Einsätze zurückerstattet.','info');
+  }catch(e){toast('Fehler: '+e.message,'error');}
+};
 
-  const participants=bet.participants?Object.values(bet.participants):[];
-  for(const p of participants){
-    const s=await fsGetDoc(fsDoc(db,'users',p.user));
-    if(s.exists()) await fsUpdateDoc(fsDoc(db,'users',p.user),{balance:Math.round((s.data().balance+p.amount)*100)/100});
-  }
-  await fsDeleteDoc(fsDoc(db,'bets',bet.id));
-  closeDetailModal();
-  showToast('Wette gelöscht. Einsätze zurückerstattet.','info');
-}
-
-// ─── MISC ────────────────────────────────────────
+// ── Misc ──────────────────────────────────────
 window.closeOnOverlay = function(e,id){
-  if(e.target.id===id){
-    if(id==='create-overlay') closeCreateModal();
-    else closeDetailModal();
-  }
-}
+  if(e.target.id===id){if(id==='create-overlay')closeCreateModal();else closeDetailModal();}
+};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCreateModal();closeDetailModal();}});
 
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ closeCreateModal(); closeDetailModal(); }
-});
 </script>
 </body>
 </html>
