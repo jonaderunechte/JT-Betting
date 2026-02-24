@@ -7,712 +7,2170 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
 <style>
-:root{--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--border:#2a2a3d;--accent:#00ff88;--accent2:#ff3366;--accent3:#7b61ff;--text:#e8e8f0;--muted:#6b6b8a;--yes:#00ff88;--no:#ff3366;--glow:0 0 20px rgba(0,255,136,0.15);}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(123,97,255,.06) 0%,transparent 60%),radial-gradient(ellipse 50% 30% at 90% 80%,rgba(0,255,136,.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
-#loading-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2000;background:var(--bg);gap:24px;}
-.loading-logo{font-family:'Bebas Neue',cursive;font-size:80px;letter-spacing:10px;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.loading-bar-wrap{width:200px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
-.loading-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent3),var(--accent));animation:loadBar 1.5s ease-in-out infinite;}
-@keyframes loadBar{0%{width:0;margin-left:0}50%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}
-.loading-status{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;}
-#auth-screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1000;background:var(--bg);}
-.auth-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:48px;width:420px;position:relative;overflow:hidden;}
-.auth-box::before{content:'';position:absolute;top:-1px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
-.auth-logo{font-family:'Bebas Neue',cursive;font-size:72px;letter-spacing:12px;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:4px;}
-.auth-tagline{text-align:center;color:var(--muted);font-size:12px;font-family:'Space Mono',monospace;letter-spacing:2px;margin-bottom:36px;text-transform:uppercase;}
-.auth-tabs{display:flex;background:var(--bg);border-radius:8px;padding:4px;margin-bottom:28px;}
-.auth-tab{flex:1;padding:10px;text-align:center;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .2s;border:none;background:transparent;font-family:'Inter',sans-serif;}
-.auth-tab.active{background:var(--surface2);color:var(--text);}
-.input-group{margin-bottom:16px;}
-.input-group label{display:block;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Space Mono',monospace;}
-.input-group input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;transition:border-color .2s,box-shadow .2s;outline:none;color-scheme:dark;}
-.input-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,255,136,.08);}
-.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#00cc6a);color:#0a0a0f;font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;transition:all .2s;font-family:'Space Mono',monospace;margin-top:8px;}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,255,136,.25);}
-.auth-error{color:var(--accent2);font-size:12px;text-align:center;margin-top:12px;font-family:'Space Mono',monospace;min-height:18px;}
-#app{display:none;position:relative;z-index:1;min-height:100vh;}
-header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;}
-.header-logo{font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.header-right{display:flex;align-items:center;gap:16px;}
-.balance-chip{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 18px;display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:13px;}
-.balance-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.balance-amount{color:var(--accent);font-weight:700;}
-.user-chip{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:6px 16px 6px 10px;display:flex;align-items:center;gap:10px;}
-.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent3),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:white;font-family:'Space Mono',monospace;}
-.user-name{font-size:13px;font-weight:500;}
-.logout-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 12px;cursor:pointer;font-size:12px;font-family:'Space Mono',monospace;transition:all .2s;}
-.logout-btn:hover{border-color:var(--accent2);color:var(--accent2);}
-main{max-width:900px;margin:0 auto;padding:32px 24px;}
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}
-.page-title{font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:2px;}
-.page-subtitle{font-size:13px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:4px;}
-.btn-new{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--accent),#00cc6a);color:#0a0a0f;border:none;border-radius:10px;padding:12px 22px;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;}
-.btn-new:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,255,136,.3);}
-.btn-new-icon{width:22px;height:22px;background:rgba(0,0,0,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
-.bets-list{display:flex;flex-direction:column;gap:12px;}
-.bet-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
-.bet-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent3));border-radius:3px 0 0 3px;opacity:0;transition:opacity .25s;}
-.bet-card:hover{border-color:rgba(0,255,136,.3);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3),var(--glow);}
-.bet-card:hover::before{opacity:1;}
-.bet-card.mine{border-color:rgba(123,97,255,.3);}
-.bet-card.mine::before{background:linear-gradient(180deg,var(--accent3),var(--accent2));}
-.bet-card.resolved-card{opacity:.75;}
-.bet-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;}
-.bet-question{font-size:15px;font-weight:500;line-height:1.5;flex:1;}
-.bet-badges{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
-.badge{padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:'Space Mono',monospace;}
-.badge-open{background:rgba(0,255,136,.12);color:var(--accent);border:1px solid rgba(0,255,136,.25);}
-.badge-closed{background:rgba(255,51,102,.12);color:var(--accent2);border:1px solid rgba(255,51,102,.25);}
-.badge-ended{background:rgba(107,107,138,.15);color:var(--muted);border:1px solid var(--border);}
-.badge-mine{background:rgba(123,97,255,.12);color:var(--accent3);border:1px solid rgba(123,97,255,.3);}
-.badge-resolved{background:rgba(0,255,136,.08);color:var(--accent);border:1px solid rgba(0,255,136,.2);}
-.badge-fixed{background:rgba(255,165,0,.1);color:#ffaa44;border:1px solid rgba(255,165,0,.25);}
-.bet-meta{display:flex;gap:20px;flex-wrap:wrap;}
-.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;}
-.meta-value{color:var(--text);font-weight:600;}
-.bet-bar-wrap{margin-top:14px;}
-.bet-bar{height:4px;background:var(--bg);border-radius:4px;overflow:hidden;display:flex;}
-.bet-bar-yes{height:100%;background:var(--yes);transition:width .6s cubic-bezier(.4,0,.2,1);}
-.bet-bar-no{height:100%;background:var(--no);transition:width .6s cubic-bezier(.4,0,.2,1);}
-.bet-bar-labels{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;font-family:'Space Mono',monospace;}
-.yes-pct{color:var(--yes);font-weight:700;}
-.no-pct{color:var(--no);font-weight:700;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px);}
-.modal-overlay.open{opacity:1;pointer-events:all;}
-.create-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:580px;position:relative;transform:translateY(20px);transition:transform .3s;max-height:90vh;overflow-y:auto;}
-.modal-overlay.open .create-modal,.modal-overlay.open .detail-modal{transform:translateY(0);}
-.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
-.modal-title{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;}
-.modal-close{width:36px;height:36px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);transition:all .2s;flex-shrink:0;}
-.modal-close:hover{border-color:var(--accent2);color:var(--accent2);}
-textarea.input-field{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;resize:vertical;min-height:90px;outline:none;transition:border-color .2s;}
-textarea.input-field:focus{border-color:var(--accent);}
-input.input-field{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;color-scheme:dark;}
-input.input-field:focus{border-color:var(--accent);}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.form-note{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:6px;}
-.modal-error{color:var(--accent2);font-size:12px;text-align:center;font-family:'Space Mono',monospace;min-height:18px;margin-top:8px;}
-.odds-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:0;user-select:none;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;transition:border-color .2s;}
-.odds-toggle:hover{border-color:var(--accent3);}
-.odds-toggle-box{width:18px;height:18px;border:2px solid var(--muted);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
-.odds-toggle-box.checked{border-color:var(--accent3);background:var(--accent3);}
-.odds-toggle-box.checked::after{content:'checkmark';font-size:0;width:10px;height:7px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 7'%3E%3Cpath d='M1 3.5L3.5 6L9 1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;}
-.odds-toggle-label{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.5px;}
-.odds-section{display:none;background:rgba(123,97,255,.04);border:1px solid rgba(123,97,255,.2);border-radius:10px;padding:16px;margin-top:12px;margin-bottom:0;}
-.odds-section.visible{display:block;}
-.odds-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.odds-input-wrap{position:relative;}
-.odds-input-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 36px 10px 14px;color:var(--text);font-size:15px;font-family:'Space Mono',monospace;outline:none;transition:border-color .2s;color-scheme:dark;}
-.odds-input-wrap input:focus{border-color:var(--accent3);}
-.odds-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;pointer-events:none;}
-.odds-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:6px;}
-.odds-note{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:12px;line-height:1.6;padding-top:10px;border-top:1px solid var(--border);}
-.detail-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;position:relative;transform:translateY(20px);transition:transform .3s;}
-.detail-header{padding:32px 32px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
-.detail-question{font-size:18px;font-weight:600;line-height:1.4;flex:1;}
-.detail-body{display:grid;grid-template-columns:1fr 320px;}
-.detail-charts{padding:24px 32px;border-right:1px solid var(--border);}
-.chart-section{margin-bottom:28px;}
-.chart-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:12px;}
-.chart-wrap{height:140px;position:relative;}
-.detail-sidebar{padding:24px;}
-.sidebar-section{margin-bottom:20px;}
-.sidebar-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:8px;}
-.vote-selector{display:flex;gap:8px;margin-bottom:16px;}
-.vote-btn{flex:1;padding:10px 8px;border-radius:10px;border:2px solid var(--border);background:transparent;font-family:'Space Mono',monospace;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:1px;line-height:1.4;}
-.vote-btn.yes{color:var(--yes);}
-.vote-btn.yes.active,.vote-btn.yes:hover{border-color:var(--yes);background:rgba(0,255,136,.1);}
-.vote-btn.no{color:var(--no);}
-.vote-btn.no.active,.vote-btn.no:hover{border-color:var(--no);background:rgba(255,51,102,.1);}
-.vote-btn .btn-odds{display:block;font-size:10px;font-weight:400;opacity:.7;margin-top:2px;}
-.amount-input-wrap{position:relative;margin-bottom:8px;}
-.amount-input-wrap input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 40px 12px 16px;color:var(--text);font-size:14px;font-family:'Space Mono',monospace;outline:none;transition:border-color .2s;color-scheme:dark;}
-.amount-input-wrap input:focus{border-color:var(--accent);}
-.amount-currency{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;}
-.payout-display{background:var(--bg);border:1px solid rgba(0,255,136,.2);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-.payout-label{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;}
-.payout-value{font-family:'Space Mono',monospace;font-weight:700;color:var(--accent);font-size:16px;}
-.current-split{display:flex;justify-content:space-between;margin-bottom:6px;}
-.split-yes{font-family:'Space Mono',monospace;font-weight:700;color:var(--yes);font-size:13px;}
-.split-no{font-family:'Space Mono',monospace;font-weight:700;color:var(--no);font-size:13px;}
-.split-bar{height:6px;background:var(--bg);border-radius:6px;overflow:hidden;display:flex;margin-bottom:16px;}
-.split-bar-yes{height:100%;background:var(--yes);transition:width .5s;}
-.split-bar-no{height:100%;background:var(--no);transition:width .5s;}
-.btn-place{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#00cc6a);color:#0a0a0f;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:10px;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;}
-.btn-place:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,255,136,.25);}
-.bet-info-rows{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
-.info-row{display:flex;justify-content:space-between;font-size:12px;}
-.info-row .key{color:var(--muted);font-family:'Space Mono',monospace;}
-.info-row .val{color:var(--text);font-family:'Space Mono',monospace;font-weight:600;}
-.fixed-odds-banner{background:rgba(255,165,0,.07);border:1px solid rgba(255,165,0,.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:#ffaa44;font-family:'Space Mono',monospace;text-align:center;line-height:1.6;}
-.sidebar-msg{text-align:center;font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);line-height:1.6;}
-.resolve-section{padding-top:0;}
-.resolve-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:10px;}
-.resolve-btns{display:flex;gap:8px;}
-.resolve-btn{flex:1;padding:10px;border-radius:8px;border:2px solid;background:transparent;font-family:'Space Mono',monospace;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;letter-spacing:1px;}
-.resolve-yes{color:var(--yes);border-color:var(--yes);}
-.resolve-yes:hover{background:rgba(0,255,136,.1);}
-.resolve-no{color:var(--no);border-color:var(--no);}
-.resolve-no:hover{background:rgba(255,51,102,.1);}
-.btn-delete{width:100%;padding:10px;background:transparent;border:1px solid rgba(255,51,102,.3);color:var(--accent2);border-radius:8px;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;transition:all .2s;margin-top:4px;}
-.btn-delete:hover{background:rgba(255,51,102,.1);border-color:var(--accent2);}
-.empty-state{text-align:center;padding:80px 24px;color:var(--muted);}
-.empty-icon{font-size:48px;margin-bottom:16px;}
-.empty-title{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;margin-bottom:8px;color:var(--text);}
-.empty-sub{font-size:14px;font-family:'Space Mono',monospace;}
-.toast{position:fixed;bottom:32px;right:32px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px;font-size:13px;font-family:'Space Mono',monospace;z-index:500;transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1);max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,.4);}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.success{border-left:3px solid var(--accent);}
-.toast.error{border-left:3px solid var(--accent2);}
-.toast.info{border-left:3px solid var(--accent3);}
-::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
-@media(max-width:640px){.detail-body{grid-template-columns:1fr;}.detail-charts{border-right:none;border-bottom:1px solid var(--border);}.form-grid,.odds-row{grid-template-columns:1fr;}header{padding:0 16px;}main{padding:24px 16px;}.auth-box{padding:32px 24px;width:calc(100% - 32px);}}
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root {
+  --bg:       #0a0a0f;
+  --surface:  #12121a;
+  --surface2: #1a1a26;
+  --border:   #2a2a3d;
+  --accent:   #00ff88;
+  --accent2:  #ff3366;
+  --accent3:  #7b61ff;
+  --text:     #e8e8f0;
+  --muted:    #6b6b8a;
+  --yes:      #00ff88;
+  --no:       #ff3366;
+  --gold:     #ffb020;
+  --glow:     0 0 20px rgba(0,255,136,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 10%, rgba(123,97,255,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 90% 80%, rgba(0,255,136,.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════
+   LOADING
+═══════════════════════════════════════ */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  background: var(--bg);
+  gap: 24px;
+}
+.loading-logo {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 80px;
+  letter-spacing: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.loading-bar-wrap { width: 200px; height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.loading-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent3), var(--accent));
+  animation: loadBar 1.5s ease-in-out infinite;
+}
+@keyframes loadBar {
+  0%   { width: 0;    margin-left: 0; }
+  50%  { width: 100%; margin-left: 0; }
+  100% { width: 0;    margin-left: 100%; }
+}
+.loading-status {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════
+   AUTH
+═══════════════════════════════════════ */
+#auth-screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  background: var(--bg);
+}
+.auth-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px;
+  width: 420px;
+  position: relative;
+  overflow: hidden;
+}
+.auth-box::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 10%; right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.auth-logo {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 72px;
+  letter-spacing: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.auth-tagline {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 2px;
+  margin-bottom: 36px;
+  text-transform: uppercase;
+}
+.auth-tabs {
+  display: flex;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: all .2s;
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+}
+.auth-tab.active { background: var(--surface2); color: var(--text); }
+
+.input-group { margin-bottom: 16px; }
+.input-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-family: 'Space Mono', monospace;
+}
+.input-group input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  transition: border-color .2s, box-shadow .2s;
+  outline: none;
+  color-scheme: dark;
+}
+.input-group input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,255,136,.08);
+}
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent), #00cc6a);
+  color: #0a0a0f;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'Space Mono', monospace;
+  margin-top: 8px;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,255,136,.25); }
+.auth-error {
+  color: var(--accent2);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 12px;
+  font-family: 'Space Mono', monospace;
+  min-height: 18px;
+}
+
+/* ═══════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════ */
+#app { display: none; position: relative; z-index: 1; min-height: 100vh; }
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,15,.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-logo {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 36px;
+  letter-spacing: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-right { display: flex; align-items: center; gap: 12px; }
+.balance-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+}
+.balance-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.balance-amount { color: var(--accent); font-weight: 700; }
+.user-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 6px 16px 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent3), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  color: white;
+  font-family: 'Space Mono', monospace;
+}
+.user-name { font-size: 13px; font-weight: 500; }
+.logout-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'Space Mono', monospace;
+  transition: all .2s;
+}
+.logout-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+/* ═══════════════════════════════════════
+   MAIN / BET CARDS
+═══════════════════════════════════════ */
+main { max-width: 920px; margin: 0 auto; padding: 32px 24px; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.page-title { font-family: 'Bebas Neue', cursive; font-size: 36px; letter-spacing: 2px; }
+.page-subtitle { font-size: 13px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 4px; }
+
+.btn-new {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--accent), #00cc6a);
+  color: #0a0a0f;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  transition: all .2s;
+}
+.btn-new:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,255,136,.3); }
+.btn-new-icon {
+  width: 22px; height: 22px;
+  background: rgba(0,0,0,.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.bets-list { display: flex; flex-direction: column; gap: 12px; }
+
+.bet-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all .25s;
+  position: relative;
+  overflow: hidden;
+}
+.bet-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent3));
+  border-radius: 3px 0 0 3px;
+  opacity: 0;
+  transition: opacity .25s;
+}
+.bet-card:hover {
+  border-color: rgba(0,255,136,.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.3), var(--glow);
+}
+.bet-card:hover::before { opacity: 1; }
+.bet-card.mine { border-color: rgba(123,97,255,.3); }
+.bet-card.mine::before { background: linear-gradient(180deg, var(--accent3), var(--accent2)); }
+.bet-card.resolved-card { opacity: .75; }
+
+/* Card top section */
+.bet-card-main { padding: 20px 24px 16px; }
+.bet-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.bet-question { font-size: 15px; font-weight: 500; line-height: 1.5; flex: 1; }
+.bet-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.badge {
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+}
+.badge-open    { background: rgba(0,255,136,.12); color: var(--accent);  border: 1px solid rgba(0,255,136,.25); }
+.badge-closed  { background: rgba(255,51,102,.12); color: var(--accent2); border: 1px solid rgba(255,51,102,.25); }
+.badge-ended   { background: rgba(107,107,138,.15); color: var(--muted);  border: 1px solid var(--border); }
+.badge-mine    { background: rgba(123,97,255,.12); color: var(--accent3); border: 1px solid rgba(123,97,255,.3); }
+.badge-resolved{ background: rgba(0,255,136,.08);  color: var(--accent);  border: 1px solid rgba(0,255,136,.2); }
+
+.bet-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+}
+.meta-value { color: var(--text); font-weight: 600; }
+
+/* ── SPORTWETTEN ODDS STRIP auf der Karte ── */
+.bet-odds-strip {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.odds-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all .2s;
+  gap: 8px;
+}
+.odds-pill.yes-pill {
+  background: rgba(0,255,136,.06);
+  border-color: rgba(0,255,136,.2);
+}
+.odds-pill.yes-pill:hover {
+  background: rgba(0,255,136,.14);
+  border-color: var(--yes);
+}
+.odds-pill.no-pill {
+  background: rgba(255,51,102,.06);
+  border-color: rgba(255,51,102,.2);
+}
+.odds-pill.no-pill:hover {
+  background: rgba(255,51,102,.14);
+  border-color: var(--no);
+}
+.odds-pill-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.odds-pill.yes-pill .odds-pill-label { color: var(--yes); }
+.odds-pill.no-pill  .odds-pill-label { color: var(--no);  }
+.odds-pill-value {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+.odds-pill.yes-pill .odds-pill-value { color: var(--yes); }
+.odds-pill.no-pill  .odds-pill-value { color: var(--no);  }
+.odds-pill-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* Dynamic odds strip (parimutuel) */
+.dynamic-odds-strip {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.dyn-pill {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid;
+  text-align: center;
+}
+.dyn-pill.yes-pill {
+  background: rgba(0,255,136,.05);
+  border-color: rgba(0,255,136,.15);
+}
+.dyn-pill.no-pill {
+  background: rgba(255,51,102,.05);
+  border-color: rgba(255,51,102,.15);
+}
+.dyn-pill-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.dyn-pill.yes-pill .dyn-pill-label { color: var(--yes); }
+.dyn-pill.no-pill  .dyn-pill-label { color: var(--no);  }
+.dyn-pill-pct {
+  font-family: 'Space Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.dyn-pill-stakes {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Progress bar */
+.bet-bar-wrap { padding: 0 24px 16px; }
+.bet-bar {
+  height: 3px;
+  background: var(--bg);
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+}
+.bet-bar-yes { height: 100%; background: var(--yes); transition: width .6s cubic-bezier(.4,0,.2,1); }
+.bet-bar-no  { height: 100%; background: var(--no);  transition: width .6s cubic-bezier(.4,0,.2,1); }
+
+/* ═══════════════════════════════════════
+   MODALS
+═══════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+  backdrop-filter: blur(8px);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.create-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  width: 100%;
+  max-width: 560px;
+  position: relative;
+  transform: translateY(20px);
+  transition: transform .3s;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-overlay.open .create-modal,
+.modal-overlay.open .detail-modal { transform: translateY(0); }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.modal-title { font-family: 'Bebas Neue', cursive; font-size: 28px; letter-spacing: 2px; }
+.modal-close {
+  width: 36px; height: 36px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--muted);
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.modal-close:hover { border-color: var(--accent2); color: var(--accent2); }
+
+textarea.input-field {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  transition: border-color .2s;
+}
+textarea.input-field:focus { border-color: var(--accent); }
+input.input-field {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color .2s;
+  color-scheme: dark;
+}
+input.input-field:focus { border-color: var(--accent); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-note { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 5px; }
+.modal-error {
+  color: var(--accent2);
+  font-size: 12px;
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  min-height: 18px;
+  margin-top: 8px;
+}
+.form-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+
+/* Feste Quoten Toggle */
+.odds-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color .2s;
+  margin-top: 20px;
+}
+.odds-toggle:hover { border-color: var(--accent3); }
+.odds-toggle.active { border-color: rgba(123,97,255,.5); background: rgba(123,97,255,.05); }
+.toggle-switch {
+  width: 36px; height: 20px;
+  background: var(--border);
+  border-radius: 10px;
+  position: relative;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  background: white;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: transform .2s;
+}
+.odds-toggle.active .toggle-switch { background: var(--accent3); }
+.odds-toggle.active .toggle-switch::after { transform: translateX(16px); }
+.odds-toggle-text { flex: 1; }
+.odds-toggle-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.odds-toggle-sub { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+
+.odds-inputs {
+  display: none;
+  margin-top: 12px;
+  padding: 16px;
+  background: rgba(123,97,255,.04);
+  border: 1px solid rgba(123,97,255,.2);
+  border-radius: 10px;
+  gap: 12px;
+}
+.odds-inputs.visible { display: grid; grid-template-columns: 1fr 1fr; }
+.odds-field-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 6px;
+}
+.odds-input-wrap { position: relative; }
+.odds-input-wrap input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 36px 11px 14px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  outline: none;
+  transition: border-color .2s;
+  color-scheme: dark;
+}
+.odds-input-wrap input:focus { border-color: var(--accent3); }
+.odds-suffix {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  pointer-events: none;
+  font-weight: 700;
+}
+.odds-preview {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+  grid-column: 1 / -1;
+}
+.odds-preview b { color: var(--text); }
+
+/* ═══════════════════════════════════════
+   DETAIL MODAL
+═══════════════════════════════════════ */
+.detail-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 880px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  transform: translateY(20px);
+  transition: transform .3s;
+}
+.detail-header {
+  padding: 28px 32px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.detail-question { font-size: 18px; font-weight: 600; line-height: 1.4; flex: 1; }
+.det-badges-row { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+.detail-body { display: grid; grid-template-columns: 1fr 300px; }
+.detail-charts { padding: 24px 28px; border-right: 1px solid var(--border); }
+.chart-section { margin-bottom: 24px; }
+.chart-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 10px;
+}
+.chart-wrap { height: 130px; position: relative; }
+
+.detail-sidebar { padding: 22px 20px; }
+.sidebar-section { margin-bottom: 20px; }
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 8px;
+}
+.bet-info-rows { display: flex; flex-direction: column; gap: 7px; }
+.info-row { display: flex; justify-content: space-between; font-size: 12px; }
+.info-row .key { color: var(--muted); font-family: 'Space Mono', monospace; }
+.info-row .val { color: var(--text); font-family: 'Space Mono', monospace; font-weight: 600; }
+
+/* Sportwetten Bet Panel */
+.sport-bet-panel { }
+
+/* Odds buttons — große Sportwetten-Optik */
+.sport-odds-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.sport-odds-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  transition: all .2s;
+  gap: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.sport-odds-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.sport-odds-btn.yes-btn { color: var(--yes); }
+.sport-odds-btn.yes-btn::before { background: rgba(0,255,136,.08); }
+.sport-odds-btn.yes-btn:hover,
+.sport-odds-btn.yes-btn.active {
+  border-color: var(--yes);
+  box-shadow: 0 0 16px rgba(0,255,136,.2);
+}
+.sport-odds-btn.yes-btn:hover::before,
+.sport-odds-btn.yes-btn.active::before { opacity: 1; }
+.sport-odds-btn.no-btn { color: var(--no); }
+.sport-odds-btn.no-btn::before { background: rgba(255,51,102,.08); }
+.sport-odds-btn.no-btn:hover,
+.sport-odds-btn.no-btn.active {
+  border-color: var(--no);
+  box-shadow: 0 0 16px rgba(255,51,102,.2);
+}
+.sport-odds-btn.no-btn:hover::before,
+.sport-odds-btn.no-btn.active::before { opacity: 1; }
+.sport-odds-btn:disabled { opacity: .35; cursor: not-allowed; }
+.sport-odds-btn:disabled:hover { border-color: var(--border); box-shadow: none; }
+.sob-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+.sob-value {
+  font-family: 'Space Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+}
+.sob-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  position: relative;
+  z-index: 1;
+}
+
+.amount-input-wrap { position: relative; margin-bottom: 8px; }
+.amount-input-wrap input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 40px 12px 16px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  outline: none;
+  transition: border-color .2s;
+  color-scheme: dark;
+}
+.amount-input-wrap input:focus { border-color: var(--accent); }
+.amount-currency {
+  position: absolute;
+  right: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+}
+
+/* Quick bet amounts */
+.quick-amounts {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.quick-amt {
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.quick-amt:hover { border-color: var(--accent); color: var(--accent); }
+
+.betslip-selection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Payout display */
+.payout-box {
+  background: var(--bg);
+  border: 1px solid rgba(0,255,136,.25);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.payout-item { text-align: center; }
+.payout-item-label { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: .5px; margin-bottom: 3px; }
+.payout-item-value { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 15px; color: var(--accent); }
+.payout-item-value.profit { color: #44ff99; }
+.payout-item-value.neutral { color: var(--text); }
+
+.btn-place {
+  width: 100%;
+  padding: 13px 10px;
+  background: linear-gradient(135deg, var(--accent), #00cc6a);
+  color: #0a0a0f;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  transition: all .2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-place:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,255,136,.25); }
+.btn-place:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.sidebar-msg {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  padding: 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  line-height: 1.7;
+}
+.resolve-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 10px;
+}
+.resolve-btns { display: flex; gap: 8px; }
+.resolve-btn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 8px;
+  border: 2px solid;
+  background: transparent;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: 1px;
+}
+.resolve-yes { color: var(--yes); border-color: var(--yes); }
+.resolve-yes:hover { background: rgba(0,255,136,.1); }
+.resolve-no  { color: var(--no);  border-color: var(--no);  }
+.resolve-no:hover  { background: rgba(255,51,102,.1); }
+.btn-delete {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid rgba(255,51,102,.3);
+  color: var(--accent2);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all .2s;
+  margin-top: 6px;
+}
+.btn-delete:hover { background: rgba(255,51,102,.1); border-color: var(--accent2); }
+
+/* ═══════════════════════════════════════
+   MISC
+═══════════════════════════════════════ */
+.empty-state { text-align: center; padding: 80px 24px; color: var(--muted); }
+.empty-icon  { font-size: 48px; margin-bottom: 16px; }
+.empty-title { font-family: 'Bebas Neue', cursive; font-size: 28px; letter-spacing: 2px; margin-bottom: 8px; color: var(--text); }
+.empty-sub   { font-size: 14px; font-family: 'Space Mono', monospace; }
+
+.toast {
+  position: fixed;
+  bottom: 32px; right: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-family: 'Space Mono', monospace;
+  z-index: 500;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all .4s cubic-bezier(.4,0,.2,1);
+  max-width: 320px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left: 3px solid var(--accent); }
+.toast.error   { border-left: 3px solid var(--accent2); }
+.toast.info    { border-left: 3px solid var(--accent3); }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width: 640px) {
+  header { padding: 0 16px; }
+  main   { padding: 20px 14px; }
+  .auth-box { padding: 28px 20px; width: calc(100% - 24px); }
+  .detail-body { grid-template-columns: 1fr; }
+  .detail-charts { border-right: none; border-bottom: 1px solid var(--border); }
+  .form-grid { grid-template-columns: 1fr; }
+  .odds-inputs { grid-template-columns: 1fr; }
+  .header-right { gap: 8px; }
+  .balance-chip { padding: 7px 12px; font-size: 12px; }
+}
 </style>
 </head>
 <body>
+
+<!-- LOADING -->
 <div id="loading-screen">
   <div class="loading-logo">JT</div>
   <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
   <div class="loading-status" id="loading-status">Verbinde mit Firebase...</div>
 </div>
+
+<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">JT</div>
     <div class="auth-tagline">Social Prediction Market</div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchAuthTab('login')">Einloggen</button>
-      <button class="auth-tab" onclick="switchAuthTab('register')">Registrieren</button>
+      <button class="auth-tab"        onclick="switchAuthTab('register')">Registrieren</button>
     </div>
     <div id="login-form">
-      <div class="input-group"><label>Benutzername</label><input type="text" id="login-user" placeholder="Dein Username" autocomplete="off" onkeydown="if(event.key==='Enter')login()"></div>
-      <div class="input-group"><label>Passwort</label><input type="password" id="login-pass" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" onkeydown="if(event.key==='Enter')login()"></div>
+      <div class="input-group">
+        <label>Benutzername</label>
+        <input type="text" id="login-user" placeholder="Dein Username"
+               autocomplete="off" onkeydown="if(event.key==='Enter')login()">
+      </div>
+      <div class="input-group">
+        <label>Passwort</label>
+        <input type="password" id="login-pass" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter')login()">
+      </div>
       <button class="btn-primary" onclick="login()">Einloggen</button>
     </div>
     <div id="register-form" style="display:none">
-      <div class="input-group"><label>Benutzername</label><input type="text" id="reg-user" placeholder="Wähle einen Username" autocomplete="off" onkeydown="if(event.key==='Enter')register()"></div>
-      <div class="input-group"><label>Passwort</label><input type="password" id="reg-pass" placeholder="Mindestens 4 Zeichen" onkeydown="if(event.key==='Enter')register()"></div>
+      <div class="input-group">
+        <label>Benutzername</label>
+        <input type="text" id="reg-user" placeholder="Wähle einen Username"
+               autocomplete="off" onkeydown="if(event.key==='Enter')register()">
+      </div>
+      <div class="input-group">
+        <label>Passwort</label>
+        <input type="password" id="reg-pass" placeholder="Mindestens 4 Zeichen"
+               onkeydown="if(event.key==='Enter')register()">
+      </div>
       <button class="btn-primary" onclick="register()">Account erstellen &mdash; 100&euro; Startguthaben</button>
     </div>
     <div class="auth-error" id="auth-error"></div>
   </div>
 </div>
+
+<!-- APP -->
 <div id="app">
   <header>
     <div class="header-logo">JT</div>
     <div class="header-right">
-      <div class="balance-chip"><div class="balance-dot"></div><span>Guthaben:</span><span class="balance-amount" id="header-balance">100.00&euro;</span></div>
-      <div class="user-chip"><div class="avatar" id="header-avatar">?</div><span class="user-name" id="header-username">User</span></div>
+      <div class="balance-chip">
+        <div class="balance-dot"></div>
+        <span>Guthaben:&nbsp;</span>
+        <span class="balance-amount" id="header-balance">100.00&euro;</span>
+      </div>
+      <div class="user-chip">
+        <div class="avatar" id="header-avatar">?</div>
+        <span class="user-name" id="header-username">User</span>
+      </div>
       <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
   </header>
+
   <main>
     <div class="page-header">
-      <div><div class="page-title">Aktuelle Wetten</div><div class="page-subtitle" id="bets-count">0 aktive Wetten</div></div>
-      <button class="btn-new" onclick="openCreateModal()"><span class="btn-new-icon">+</span>Neue Wette</button>
+      <div>
+        <div class="page-title">Aktuelle Wetten</div>
+        <div class="page-subtitle" id="bets-count">0 aktive Wetten</div>
+      </div>
+      <button class="btn-new" onclick="openCreateModal()">
+        <span class="btn-new-icon">+</span>Neue Wette
+      </button>
     </div>
-    <div class="bets-list" id="bets-list"><div class="empty-state"><div class="empty-icon">&#127919;</div><div class="empty-title">Laden...</div></div></div>
+    <div class="bets-list" id="bets-list">
+      <div class="empty-state">
+        <div class="empty-icon">🎯</div>
+        <div class="empty-title">Laden...</div>
+      </div>
+    </div>
   </main>
 </div>
+
+<!-- CREATE MODAL -->
 <div class="modal-overlay" id="create-overlay" onclick="closeOnOverlay(event,'create-overlay')">
   <div class="create-modal">
-    <div class="modal-header"><div class="modal-title">Neue Wette</div><div class="modal-close" onclick="closeCreateModal()">&#x2715;</div></div>
-    <div class="input-group"><label>Frage / Wette</label><textarea class="input-field" id="new-question" placeholder="z.B. Trump sagt n&auml;chste Woche mindestens 15x Russia..."></textarea></div>
+    <div class="modal-header">
+      <div class="modal-title">Neue Wette</div>
+      <div class="modal-close" onclick="closeCreateModal()">&#x2715;</div>
+    </div>
+
+    <div class="input-group">
+      <label>Frage / Wette</label>
+      <textarea class="input-field" id="new-question"
+        placeholder="z.B. Deutschland gewinnt die WM 2026..."></textarea>
+    </div>
+
     <div class="form-grid">
-      <div class="input-group"><label>Wettenannahme bis</label><input type="datetime-local" class="input-field" id="new-bet-close"><div class="form-note">Mindestens 1 Tag ab jetzt</div></div>
-      <div class="input-group"><label>Wette endet am</label><input type="datetime-local" class="input-field" id="new-bet-end"><div class="form-note">Muss nach Annahmeschluss sein</div></div>
-    </div>
-    <div class="odds-toggle" onclick="toggleOddsSection()" style="margin-top:4px">
-      <div class="odds-toggle-box" id="odds-toggle-box"></div>
-      <span class="odds-toggle-label">&#128202; Feste Quoten selbst festlegen (optional)</span>
-    </div>
-    <div class="odds-section" id="odds-section">
-      <div class="odds-row">
-        <div><div class="odds-lbl" style="color:var(--yes)">JA &mdash; Quote</div><div class="odds-input-wrap"><input type="number" id="odds-yes" placeholder="z.B. 2.50" min="1.01" step="0.01"><span class="odds-suffix">x</span></div></div>
-        <div><div class="odds-lbl" style="color:var(--no)">NEIN &mdash; Quote</div><div class="odds-input-wrap"><input type="number" id="odds-no" placeholder="z.B. 1.60" min="1.01" step="0.01"><span class="odds-suffix">x</span></div></div>
+      <div class="input-group">
+        <label>Annahme bis</label>
+        <input type="datetime-local" class="input-field" id="new-bet-close">
+        <div class="form-note">Min. 1 Tag in der Zukunft</div>
       </div>
-      <div class="odds-note">&#128161; Gewinn = Einsatz &times; Quote &mdash; fix, unabh&auml;ngig von anderen Wetten. Nur die Seiten einf&uuml;llen, auf die gewettet werden kann.</div>
+      <div class="input-group">
+        <label>Endet am</label>
+        <input type="datetime-local" class="input-field" id="new-bet-end">
+        <div class="form-note">Nach dem Annahmeschluss</div>
+      </div>
     </div>
-    <button class="btn-primary" onclick="createBet()" style="margin-top:16px">Wette er&ouml;ffnen</button>
+
+    <!-- Feste Quoten Toggle -->
+    <div class="odds-toggle" id="odds-toggle" onclick="toggleOdds()">
+      <div class="toggle-switch"></div>
+      <div class="odds-toggle-text">
+        <div class="odds-toggle-title">Feste Quoten (Sportwetten-Modus)</div>
+        <div class="odds-toggle-sub">Setze eigene Quoten &mdash; Gewinn = Einsatz &times; Quote</div>
+      </div>
+    </div>
+
+    <div class="odds-inputs" id="odds-inputs">
+      <div>
+        <div class="odds-field-label" style="color:var(--yes)">JA &mdash; Quote</div>
+        <div class="odds-input-wrap">
+          <input type="number" id="odds-yes" placeholder="2.00" min="1.01" step="0.05"
+                 oninput="updateOddsPreview()">
+          <span class="odds-suffix">x</span>
+        </div>
+      </div>
+      <div>
+        <div class="odds-field-label" style="color:var(--no)">NEIN &mdash; Quote</div>
+        <div class="odds-input-wrap">
+          <input type="number" id="odds-no" placeholder="2.00" min="1.01" step="0.05"
+                 oninput="updateOddsPreview()">
+          <span class="odds-suffix">x</span>
+        </div>
+      </div>
+      <div class="odds-preview" id="odds-preview">
+        Trage Quoten ein, um eine Vorschau zu sehen.
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="createBet()" style="margin-top:20px">
+      Wette er&ouml;ffnen
+    </button>
     <div class="modal-error" id="create-error"></div>
   </div>
 </div>
+
+<!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detail-overlay" onclick="closeOnOverlay(event,'detail-overlay')">
   <div class="detail-modal">
     <div class="detail-header">
-      <div><div class="detail-question" id="det-question">&mdash;</div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap" id="det-badges"></div></div>
+      <div>
+        <div class="detail-question" id="det-question">—</div>
+        <div class="det-badges-row" id="det-badges"></div>
+      </div>
       <div class="modal-close" onclick="closeDetailModal()">&#x2715;</div>
     </div>
+
     <div class="detail-body">
+      <!-- Charts -->
       <div class="detail-charts">
-        <div class="chart-section"><div class="chart-label">&#128200; Gesamteinsatz &uuml;ber Zeit</div><div class="chart-wrap"><canvas id="chart-volume"></canvas></div></div>
-        <div class="chart-section"><div class="chart-label">&#9878; Ja / Nein Verh&auml;ltnis &uuml;ber Zeit</div><div class="chart-wrap"><canvas id="chart-split"></canvas></div></div>
+        <div class="chart-section">
+          <div class="chart-label">📈 Gesamteinsatz &uuml;ber Zeit</div>
+          <div class="chart-wrap"><canvas id="chart-volume"></canvas></div>
+        </div>
+        <div class="chart-section">
+          <div class="chart-label">⚖️ Verteilung &uuml;ber Zeit</div>
+          <div class="chart-wrap"><canvas id="chart-split"></canvas></div>
+        </div>
       </div>
+
+      <!-- Sidebar -->
       <div class="detail-sidebar">
-        <div class="sidebar-section"><div class="sidebar-label">Info</div><div class="bet-info-rows" id="det-info"></div></div>
-        <div id="det-fixed-odds-banner"></div>
+        <!-- Info -->
+        <div class="sidebar-section">
+          <div class="sidebar-label">Info</div>
+          <div class="bet-info-rows" id="det-info"></div>
+        </div>
+
+        <!-- Bet Panel (für Tipper) -->
         <div class="sidebar-section" id="det-vote-section">
-          <div class="sidebar-label">Deine Stimme</div>
-          <div class="vote-selector">
-            <button class="vote-btn yes" id="vote-btn-yes" onclick="selectVote('yes')">JA</button>
-            <button class="vote-btn no" id="vote-btn-no" onclick="selectVote('no')">NEIN</button>
+          <div class="sidebar-label">Deine Wette</div>
+          <div class="sport-bet-panel">
+            <div class="sport-odds-btns">
+              <button class="sport-odds-btn yes-btn" id="sob-yes" onclick="selectVote('yes')">
+                <span class="sob-label">JA</span>
+                <span class="sob-value" id="sob-yes-val">—</span>
+                <span class="sob-sub" id="sob-yes-sub"></span>
+              </button>
+              <button class="sport-odds-btn no-btn" id="sob-no" onclick="selectVote('no')">
+                <span class="sob-label">NEIN</span>
+                <span class="sob-value" id="sob-no-val">—</span>
+                <span class="sob-sub" id="sob-no-sub"></span>
+              </button>
+            </div>
+            <div class="quick-amounts">
+              <span class="quick-amt" onclick="setAmount(5)">5€</span>
+              <span class="quick-amt" onclick="setAmount(10)">10€</span>
+              <span class="quick-amt" onclick="setAmount(25)">25€</span>
+              <span class="quick-amt" onclick="setAmount(50)">50€</span>
+              <span class="quick-amt" onclick="setAmountMax()">Max</span>
+            </div>
+            <div class="betslip-selection" id="betslip-selection" style="display:none">
+              <span id="betslip-side-icon">✓</span>
+              <span id="betslip-side-txt">JA</span>
+              <span id="betslip-odds-txt" style="margin-left:auto;color:var(--accent);font-weight:700"></span>
+            </div>
+            <div class="amount-input-wrap">
+              <input type="number" id="bet-amount" placeholder="Einsatz..." min="1"
+                     oninput="updatePayout()">
+              <span class="amount-currency">€</span>
+            </div>
+            <div class="payout-box" id="payout-box">
+              <div class="payout-item">
+                <div class="payout-item-label">MÖGLICHER GEWINN</div>
+                <div class="payout-item-value neutral" id="payout-total">— €</div>
+              </div>
+              <div class="payout-item">
+                <div class="payout-item-label">PROFIT</div>
+                <div class="payout-item-value profit" id="payout-profit">— €</div>
+              </div>
+            </div>
+            <button class="btn-place" id="btn-place" onclick="placeBet()" disabled>
+              Wette platzieren
+            </button>
+            <div class="modal-error" id="bet-error"></div>
           </div>
-          <div class="amount-input-wrap"><input type="number" id="bet-amount" placeholder="Einsatz..." min="1" oninput="updatePayout()"><span class="amount-currency">&euro;</span></div>
-          <div class="payout-display"><span class="payout-label">M&ouml;glicher Gewinn</span><span class="payout-value" id="payout-val">&mdash; &euro;</span></div>
-          <div class="sidebar-label">Aktuell</div>
-          <div class="current-split"><span class="split-yes" id="det-yes-pct">JA 50%</span><span class="split-no" id="det-no-pct">NEIN 50%</span></div>
-          <div class="split-bar"><div class="split-bar-yes" id="det-split-yes" style="width:50%"></div><div class="split-bar-no" id="det-split-no" style="width:50%"></div></div>
-          <button class="btn-place" onclick="placeBet()">Wette platzieren</button>
-          <div class="modal-error" id="bet-error"></div>
         </div>
+
+        <!-- Resolve (für Ersteller) -->
         <div class="sidebar-section" id="det-resolve-section" style="display:none">
-          <div class="resolve-section"><div class="resolve-title">Ergebnis festlegen</div><div class="resolve-btns"><button class="resolve-btn resolve-yes" onclick="resolveBet('yes')">&#10003; JA</button><button class="resolve-btn resolve-no" onclick="resolveBet('no')">&#x2717; NEIN</button></div></div>
+          <div class="resolve-title">Ergebnis festlegen</div>
+          <div class="resolve-btns">
+            <button class="resolve-btn resolve-yes" onclick="resolveBet('yes')">&#10003; JA</button>
+            <button class="resolve-btn resolve-no"  onclick="resolveBet('no')">&#x2717; NEIN</button>
+          </div>
         </div>
-        <div class="sidebar-section" id="det-msg-section" style="display:none"><div class="sidebar-msg" id="det-msg-text"></div></div>
-        <div class="sidebar-section" id="det-delete-section" style="display:none"><button class="btn-delete" onclick="deleteBet()">&#128465; Wette l&ouml;schen</button></div>
+
+        <!-- Message -->
+        <div class="sidebar-section" id="det-msg-section" style="display:none">
+          <div class="sidebar-msg" id="det-msg-text"></div>
+        </div>
+
+        <!-- Delete -->
+        <div class="sidebar-section" id="det-delete-section" style="display:none">
+          <button class="btn-delete" onclick="deleteBet()">&#128465; Wette l&ouml;schen</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc,
+  getDoc, setDoc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* ── Firebase ─────────────────────────────────── */
 const firebaseConfig = {
-  apiKey: "AIzaSyBbtNRoUiuuKrJBO9ulPNVNCo_h1woEF_A",
-  authDomain: "jt-betting.firebaseapp.com",
-  projectId: "jt-betting",
-  storageBucket: "jt-betting.firebasestorage.app",
+  apiKey:            "AIzaSyBbtNRoUiuuKrJBO9ulPNVNCo_h1woEF_A",
+  authDomain:        "jt-betting.firebaseapp.com",
+  projectId:         "jt-betting",
+  storageBucket:     "jt-betting.firebasestorage.app",
   messagingSenderId: "175871107945",
-  appId: "1:175871107945:web:d8a2cc669da103d6d093f8"
+  appId:             "1:175871107945:web:d8a2cc669da103d6d093f8"
 };
-
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db  = getFirestore(app);
 
-let currentUser=null,currentDetailBetId=null,selectedVote=null;
-let volumeChart=null,splitChart=null,betsUnsub=null,allBets=[];
-let oddsEnabled=false;
+/* ── State ────────────────────────────────────── */
+let currentUser        = null;
+let currentDetailBetId = null;
+let selectedVote       = null;
+let volumeChart        = null;
+let splitChart         = null;
+let betsUnsub          = null;
+let allBets            = [];
+let oddsEnabled        = false;
+let currentUserBalance = 100;
 
-// Boot
-setStatus('Firebase verbunden');
+/* ── Boot ─────────────────────────────────────── */
+setStatus('Firebase verbunden ✓');
 try {
-  const saved=sessionStorage.getItem('jt_user');
-  if(saved){
-    const snap=await getDoc(doc(db,'users',saved));
-    if(snap.exists()){currentUser=saved;hideLoading();enterApp();}
-    else{sessionStorage.removeItem('jt_user');showAuth();}
-  }else{showAuth();}
-}catch(e){setStatus('Fehler: '+e.message);}
-
-function setStatus(m){document.getElementById('loading-status').textContent=m;}
-function hideLoading(){document.getElementById('loading-screen').style.display='none';}
-function showAuth(){hideLoading();document.getElementById('auth-screen').style.display='flex';}
-function showEl(id){document.getElementById(id).style.display='block';}
-function hideEl(id){document.getElementById(id).style.display='none';}
-function setTxt(id,t){document.getElementById(id).textContent=t;}
-function fmtMoney(n){return (Math.round(n*100)/100).toFixed(2)+'€';}
-function todayStr(){return new Date().toISOString().slice(0,10);}
-function fmtDate(ms){return new Date(ms).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-function fmtShort(ms){const d=new Date(ms);return d.getDate()+'.'+(d.getMonth()+1)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function toInput(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes());}
-
-let _tt=null;
-function toast(msg,type){
-  const t=document.getElementById('toast');
-  t.className='toast '+(type||'info');t.innerHTML='<span>'+msg+'</span>';
-  clearTimeout(_tt);void t.offsetWidth;t.classList.add('show');
-  _tt=setTimeout(()=>t.classList.remove('show'),3500);
+  const saved = sessionStorage.getItem('jt_user');
+  if (saved) {
+    const snap = await getDoc(doc(db, 'users', saved));
+    if (snap.exists()) {
+      currentUser = saved;
+      hideLoading();
+      enterApp();
+    } else {
+      sessionStorage.removeItem('jt_user');
+      showAuth();
+    }
+  } else {
+    showAuth();
+  }
+} catch(e) {
+  setStatus('Verbindungsfehler: ' + e.message);
 }
 
-window.switchAuthTab=function(tab){
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
-  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
-  document.getElementById('register-form').style.display=tab==='register'?'block':'none';
-  document.getElementById('auth-error').textContent='';
+/* ── Helpers ──────────────────────────────────── */
+function setStatus(m)  { document.getElementById('loading-status').textContent = m; }
+function hideLoading() { document.getElementById('loading-screen').style.display = 'none'; }
+function showAuth()    { hideLoading(); document.getElementById('auth-screen').style.display = 'flex'; }
+function showEl(id)    { document.getElementById(id).style.display = 'block'; }
+function hideEl(id)    { document.getElementById(id).style.display = 'none'; }
+function setTxt(id, t) { document.getElementById(id).textContent = t; }
+
+function fmtMoney(n)  { return (Math.round(n * 100) / 100).toFixed(2) + '€'; }
+function fmtOdds(n)   { return n ? n.toFixed(2) : '—'; }
+function todayStr()   { return new Date().toISOString().slice(0, 10); }
+function fmtDate(ms)  {
+  return new Date(ms).toLocaleDateString('de-DE', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+function fmtShort(ms) {
+  const d = new Date(ms);
+  return d.getDate() + '.' + (d.getMonth()+1) + ' ' +
+         String(d.getHours()).padStart(2,'0') + ':' +
+         String(d.getMinutes()).padStart(2,'0');
+}
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toInput(d) {
+  const p = n => String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+
+         'T'+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+let _tt = null;
+function toast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + type;
+  t.innerHTML = '<span>' + msg + '</span>';
+  clearTimeout(_tt);
+  void t.offsetWidth;
+  t.classList.add('show');
+  _tt = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ── Auth ─────────────────────────────────────── */
+window.switchAuthTab = function(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t, i) =>
+    t.classList.toggle('active', (i===0&&tab==='login') || (i===1&&tab==='register'))
+  );
+  document.getElementById('login-form').style.display    = tab==='login'    ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('auth-error').textContent = '';
 };
 
-window.register=async function(){
-  const u=document.getElementById('reg-user').value.trim();
-  const p=document.getElementById('reg-pass').value;
-  const err=document.getElementById('auth-error');
-  if(!u||u.length<2){err.textContent='Benutzername zu kurz';return;}
-  if(!p||p.length<4){err.textContent='Passwort zu kurz (min. 4 Zeichen)';return;}
-  if(!/^[a-zA-Z0-9_-]+$/.test(u)){err.textContent='Nur Buchstaben, Zahlen, _ und - erlaubt';return;}
-  try{
-    if((await getDoc(doc(db,'users',u))).exists()){err.textContent='Benutzername bereits vergeben';return;}
-    await setDoc(doc(db,'users',u),{password:p,balance:100,betsMadeToday:0,lastBetDate:''});
-    err.style.color='var(--accent)';err.textContent='Account erstellt! Jetzt einloggen.';
-    setTimeout(()=>{err.textContent='';err.style.color='';switchAuthTab('login');},1500);
-  }catch(e){err.textContent='Fehler: '+e.message;}
+window.register = async function() {
+  const u   = document.getElementById('reg-user').value.trim();
+  const p   = document.getElementById('reg-pass').value;
+  const err = document.getElementById('auth-error');
+  if (!u || u.length < 2)              { err.textContent = 'Benutzername zu kurz (min. 2)'; return; }
+  if (!p || p.length < 4)              { err.textContent = 'Passwort zu kurz (min. 4 Zeichen)'; return; }
+  if (!/^[a-zA-Z0-9_-]+$/.test(u))    { err.textContent = 'Nur Buchstaben, Zahlen, _ und - erlaubt'; return; }
+  try {
+    if ((await getDoc(doc(db,'users',u))).exists()) { err.textContent = 'Benutzername bereits vergeben'; return; }
+    await setDoc(doc(db,'users',u), { password:p, balance:100, betsMadeToday:0, lastBetDate:'' });
+    err.style.color = 'var(--accent)';
+    err.textContent = 'Account erstellt! Jetzt einloggen.';
+    setTimeout(() => { err.textContent=''; err.style.color=''; switchAuthTab('login'); }, 1500);
+  } catch(e) { err.textContent = 'Fehler: ' + e.message; }
 };
 
-window.login=async function(){
-  const u=document.getElementById('login-user').value.trim();
-  const p=document.getElementById('login-pass').value;
-  const err=document.getElementById('auth-error');
-  if(!u||!p){err.textContent='Bitte alle Felder ausfüllen';return;}
-  try{
-    const snap=await getDoc(doc(db,'users',u));
-    if(!snap.exists()||snap.data().password!==p){err.textContent='Falscher Benutzername oder Passwort';return;}
-    currentUser=u;sessionStorage.setItem('jt_user',u);
-    document.getElementById('auth-screen').style.display='none';
+window.login = async function() {
+  const u   = document.getElementById('login-user').value.trim();
+  const p   = document.getElementById('login-pass').value;
+  const err = document.getElementById('auth-error');
+  if (!u || !p) { err.textContent = 'Bitte alle Felder ausfüllen'; return; }
+  try {
+    const snap = await getDoc(doc(db,'users',u));
+    if (!snap.exists() || snap.data().password !== p) {
+      err.textContent = 'Falscher Benutzername oder Passwort'; return;
+    }
+    currentUser = u;
+    sessionStorage.setItem('jt_user', u);
+    document.getElementById('auth-screen').style.display = 'none';
     enterApp();
-  }catch(e){err.textContent='Fehler: '+e.message;}
+  } catch(e) { err.textContent = 'Fehler: ' + e.message; }
 };
 
-window.logout=function(){
-  currentUser=null;sessionStorage.removeItem('jt_user');
-  if(betsUnsub){betsUnsub();betsUnsub=null;}
-  hideEl('app');document.getElementById('auth-screen').style.display='flex';
+window.logout = function() {
+  currentUser = null;
+  sessionStorage.removeItem('jt_user');
+  if (betsUnsub) { betsUnsub(); betsUnsub = null; }
+  hideEl('app');
+  document.getElementById('auth-screen').style.display = 'flex';
 };
 
-function enterApp(){
-  document.getElementById('app').style.display='block';
-  updateHeader();subscribeToData();
-  setInterval(autoDeleteExpired,5*60*1000);
+/* ── App ──────────────────────────────────────── */
+function enterApp() {
+  document.getElementById('app').style.display = 'block';
+  updateHeader();
+  subscribeToData();
+  setInterval(autoDeleteExpired, 5 * 60 * 1000);
 }
 
-async function updateHeader(){
-  try{
-    const snap=await getDoc(doc(db,'users',currentUser));
-    if(!snap.exists())return;
-    const u=snap.data();
-    setTxt('header-username',currentUser);
-    setTxt('header-avatar',currentUser.charAt(0).toUpperCase());
-    setTxt('header-balance',fmtMoney(u.balance));
-  }catch(e){console.warn(e);}
+async function updateHeader() {
+  try {
+    const snap = await getDoc(doc(db,'users',currentUser));
+    if (!snap.exists()) return;
+    const u = snap.data();
+    currentUserBalance = u.balance;
+    setTxt('header-username', currentUser);
+    setTxt('header-avatar',   currentUser.charAt(0).toUpperCase());
+    setTxt('header-balance',  fmtMoney(u.balance));
+  } catch(e) { console.warn(e); }
 }
 
-function subscribeToData(){
-  const q=query(collection(db,'bets'),orderBy('createdAt','desc'));
-  betsUnsub=onSnapshot(q,snap=>{
-    allBets=snap.docs.map(d=>({...d.data(),id:d.id}));
-    allBets.sort((a,b)=>{
-      const o={open:0,closed:1,ended:2,resolved:3};
-      const sa=betStatus(a),sb=betStatus(b);
-      return o[sa]!==o[sb]?o[sa]-o[sb]:b.createdAt-a.createdAt;
+function subscribeToData() {
+  const q = query(collection(db,'bets'), orderBy('createdAt','desc'));
+  betsUnsub = onSnapshot(q, snap => {
+    allBets = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+    allBets.sort((a, b) => {
+      const o = { open:0, closed:1, ended:2, resolved:3 };
+      const sa = betStatus(a), sb = betStatus(b);
+      return o[sa] !== o[sb] ? o[sa] - o[sb] : b.createdAt - a.createdAt;
     });
-    renderBets();updateHeader();autoDeleteExpired();
-  },e=>console.error('Snapshot:',e));
+    renderBets();
+    updateHeader();
+    autoDeleteExpired();
+  }, e => console.error('Snapshot:', e));
 }
 
-async function autoDeleteExpired(){
-  const now=Date.now();
-  for(const bet of allBets){
-    if(bet.resolved&&bet.resolvedAt&&(now-bet.resolvedAt)>86400000){
-      try{await deleteDoc(doc(db,'bets',bet.id));}catch(e){}
+async function autoDeleteExpired() {
+  const now = Date.now();
+  for (const bet of allBets) {
+    if (bet.resolved && bet.resolvedAt && (now - bet.resolvedAt) > 86400000) {
+      try { await deleteDoc(doc(db,'bets',bet.id)); } catch(e) {}
     }
   }
 }
 
-function betStatus(bet){
-  const now=Date.now();
-  if(bet.resolved)return 'resolved';
-  if(now>bet.endDate)return 'ended';
-  if(now>bet.closeDate)return 'closed';
+function betStatus(bet) {
+  const now = Date.now();
+  if (bet.resolved)       return 'resolved';
+  if (now > bet.endDate)  return 'ended';
+  if (now > bet.closeDate)return 'closed';
   return 'open';
 }
 
-function renderBets(){
-  const list=document.getElementById('bets-list');
-  if(!allBets.length){
-    list.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Noch keine Wetten</div><div class="empty-sub">Erstelle die erste Wette!</div></div>';
-    setTxt('bets-count','0 aktive Wetten');return;
+/* ── Render bet cards ─────────────────────────── */
+function renderBets() {
+  const list = document.getElementById('bets-list');
+  if (!allBets.length) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🎯</div>
+      <div class="empty-title">Noch keine Wetten</div>
+      <div class="empty-sub">Erstelle die erste Wette!</div>
+    </div>`;
+    setTxt('bets-count', '0 aktive Wetten');
+    return;
   }
-  const active=allBets.filter(b=>betStatus(b)==='open').length;
-  setTxt('bets-count',active+' offen · '+allBets.length+' gesamt');
-  list.innerHTML=allBets.map(bet=>{
-    const st=betStatus(bet);
-    const total=(bet.stakeYes||0)+(bet.stakeNo||0);
-    const isFixed=!!(bet.oddsYes||bet.oddsNo);
-    const yesPct=total>0?Math.round((bet.stakeYes||0)/total*100):50;
-    const noPct=100-yesPct;
-    const isMine=bet.creator===currentUser;
-    const parts=bet.participants?Object.values(bet.participants):[];
-    const didBet=parts.some(p=>p.user===currentUser);
-    const sb={open:'<span class="badge badge-open">🟢 Offen</span>',closed:'<span class="badge badge-closed">🔴 Annahme zu</span>',ended:'<span class="badge badge-ended">⏱ Beendet</span>',resolved:'<span class="badge badge-resolved">✓ '+(bet.winner==='yes'?'JA gewann':'NEIN gewann')+'</span>'}[st];
-    let dn='';
-    if(st==='resolved'&&bet.resolvedAt){const h=Math.ceil((bet.resolvedAt+86400000-Date.now())/3600000);if(h>0)dn='<div class="meta-item">🗑 Wird in ~'+h+'h entfernt</div>';}
-    const oddsInfo=isFixed?'<div class="meta-item">📊 <span class="meta-value">'+(bet.oddsYes?bet.oddsYes.toFixed(2)+'x':'-')+'</span> JA / <span class="meta-value">'+(bet.oddsNo?bet.oddsNo.toFixed(2)+'x':'-')+'</span> NEIN</div>':'';
-    const yLabel=isFixed&&bet.oddsYes?'JA '+bet.oddsYes.toFixed(2)+'x':'JA '+yesPct+'%';
-    const nLabel=isFixed&&bet.oddsNo?bet.oddsNo.toFixed(2)+'x NEIN':noPct+'% NEIN';
-    return '<div class="bet-card '+(isMine?'mine ':'')+( st==='resolved'?'resolved-card':'')+'" onclick="openDetailModal(\''+bet.id+'\')">'
-      +'<div class="bet-card-top"><div class="bet-question">'+esc(bet.question)+'</div>'
-      +'<div class="bet-badges">'+sb+(isFixed?'<span class="badge badge-fixed">📊 Feste Quote</span>':'')+(isMine?'<span class="badge badge-mine">⚙ Meine</span>':'')+(didBet&&!isMine?'<span class="badge badge-mine" style="background:rgba(0,255,136,.08);color:var(--accent);border-color:rgba(0,255,136,.2)">✓ Gewettet</span>':'')+'</div></div>'
-      +'<div class="bet-meta">'
-      +'<div class="meta-item">👤 '+esc(bet.creator)+'</div>'
-      +'<div class="meta-item">💰 <span class="meta-value">'+fmtMoney(total)+'</span> Gesamt</div>'
-      +'<div class="meta-item">📅 Annahme: <span class="meta-value">'+fmtDate(bet.closeDate)+'</span></div>'
-      +'<div class="meta-item">🏁 Ende: <span class="meta-value">'+fmtDate(bet.endDate)+'</span></div>'
-      +oddsInfo+dn+'</div>'
-      +'<div class="bet-bar-wrap">'
-      +'<div class="bet-bar"><div class="bet-bar-yes" style="width:'+yesPct+'%"></div><div class="bet-bar-no" style="width:'+noPct+'%"></div></div>'
-      +'<div class="bet-bar-labels"><span class="yes-pct">'+yLabel+'</span><span class="no-pct">'+nLabel+'</span></div>'
-      +'</div></div>';
+  const active = allBets.filter(b => betStatus(b) === 'open').length;
+  setTxt('bets-count', active + ' offen · ' + allBets.length + ' gesamt');
+
+  list.innerHTML = allBets.map(bet => {
+    const st      = betStatus(bet);
+    const total   = (bet.stakeYes||0) + (bet.stakeNo||0);
+    const isFixed = !!(bet.oddsYes || bet.oddsNo);
+    const yesPct  = total > 0 ? Math.round((bet.stakeYes||0) / total * 100) : 50;
+    const noPct   = 100 - yesPct;
+    const isMine  = bet.creator === currentUser;
+    const parts   = bet.participants ? Object.values(bet.participants) : [];
+    const didBet  = parts.some(p => p.user === currentUser);
+
+    const statusBadge = {
+      open:     '<span class="badge badge-open">🟢 Offen</span>',
+      closed:   '<span class="badge badge-closed">🔴 Geschlossen</span>',
+      ended:    '<span class="badge badge-ended">⏱ Beendet</span>',
+      resolved: `<span class="badge badge-resolved">✓ ${bet.winner==='yes'?'JA':'NEIN'} gewann</span>`
+    }[st];
+
+    let deleteSoon = '';
+    if (st === 'resolved' && bet.resolvedAt) {
+      const h = Math.ceil((bet.resolvedAt + 86400000 - Date.now()) / 3600000);
+      if (h > 0) deleteSoon = `<div class="meta-item">🗑 In ~${h}h entfernt</div>`;
+    }
+
+    // Odds display strip
+    let oddsStrip = '';
+    if (isFixed) {
+      // Sportwetten-Stil: große Quoten-Buttons
+      const yVal = bet.oddsYes ? bet.oddsYes.toFixed(2) : null;
+      const nVal = bet.oddsNo  ? bet.oddsNo.toFixed(2)  : null;
+      oddsStrip = `<div class="bet-odds-strip">
+        ${yVal ? `<div class="odds-pill yes-pill" onclick="event.stopPropagation();quickBet('${bet.id}','yes')">
+          <div>
+            <div class="odds-pill-label">JA</div>
+            <div class="odds-pill-sub">Bei Sieg</div>
+          </div>
+          <div class="odds-pill-value">${yVal}x</div>
+        </div>` : ''}
+        ${nVal ? `<div class="odds-pill no-pill" onclick="event.stopPropagation();quickBet('${bet.id}','no')">
+          <div>
+            <div class="odds-pill-label">NEIN</div>
+            <div class="odds-pill-sub">Bei Sieg</div>
+          </div>
+          <div class="odds-pill-value">${nVal}x</div>
+        </div>` : ''}
+      </div>`;
+    } else {
+      // Dynamisch: Prozentualer Split
+      oddsStrip = `<div class="dynamic-odds-strip">
+        <div class="dyn-pill yes-pill">
+          <div class="dyn-pill-label">JA</div>
+          <div class="dyn-pill-pct">${yesPct}%</div>
+          <div class="dyn-pill-stakes">${fmtMoney(bet.stakeYes||0)}</div>
+        </div>
+        <div class="dyn-pill no-pill">
+          <div class="dyn-pill-label">NEIN</div>
+          <div class="dyn-pill-pct">${noPct}%</div>
+          <div class="dyn-pill-stakes">${fmtMoney(bet.stakeNo||0)}</div>
+        </div>
+      </div>`;
+    }
+
+    return `<div class="bet-card ${isMine?'mine':''} ${st==='resolved'?'resolved-card':''}"
+                 onclick="openDetailModal('${bet.id}')">
+      <div class="bet-card-main">
+        <div class="bet-card-top">
+          <div class="bet-question">${esc(bet.question)}</div>
+          <div class="bet-badges">
+            ${statusBadge}
+            ${isFixed ? '<span class="badge" style="background:rgba(255,176,32,.1);color:var(--gold);border:1px solid rgba(255,176,32,.3)">📊 Feste Quote</span>' : ''}
+            ${isMine  ? '<span class="badge badge-mine">⚙ Meine</span>' : ''}
+            ${didBet && !isMine ? '<span class="badge" style="background:rgba(0,255,136,.08);color:var(--accent);border-color:rgba(0,255,136,.2)">✓ Gesetzt</span>' : ''}
+          </div>
+        </div>
+        <div class="bet-meta">
+          <div class="meta-item">👤 ${esc(bet.creator)}</div>
+          <div class="meta-item">💰 <span class="meta-value">${fmtMoney(total)}</span> Pot</div>
+          <div class="meta-item">👥 <span class="meta-value">${parts.length}</span> Tipper</div>
+          <div class="meta-item">📅 Bis <span class="meta-value">${fmtDate(bet.closeDate)}</span></div>
+          ${deleteSoon}
+        </div>
+        ${oddsStrip}
+      </div>
+      <div class="bet-bar-wrap">
+        <div class="bet-bar">
+          <div class="bet-bar-yes" style="width:${yesPct}%"></div>
+          <div class="bet-bar-no"  style="width:${noPct}%"></div>
+        </div>
+      </div>
+    </div>`;
   }).join('');
 }
 
-window.toggleOddsSection=function(){
-  oddsEnabled=!oddsEnabled;
-  document.getElementById('odds-toggle-box').className='odds-toggle-box'+(oddsEnabled?' checked':'');
-  document.getElementById('odds-section').className='odds-section'+(oddsEnabled?' visible':'');
-  if(!oddsEnabled){document.getElementById('odds-yes').value='';document.getElementById('odds-no').value='';}
+/* ── Quick-Bet vom Card direkt ────────────────── */
+window.quickBet = function(id, side) {
+  openDetailModal(id, side);
 };
 
-window.openCreateModal=async function(){
-  try{
-    const snap=await getDoc(doc(db,'users',currentUser));
-    const u=snap.data(),today=todayStr();
-    if(u.lastBetDate!==today){await updateDoc(doc(db,'users',currentUser),{betsMadeToday:0,lastBetDate:today});u.betsMadeToday=0;}
-    if(u.betsMadeToday>=2){toast('Du hast heute bereits 2 Wetten eröffnet!','error');return;}
-  }catch(e){toast('Fehler: '+e.message,'error');return;}
-  const now=new Date(),mc=new Date(now.getTime()+86400000),me=new Date(mc.getTime()+3600000);
-  document.getElementById('new-bet-close').value=toInput(mc);
-  document.getElementById('new-bet-end').value=toInput(me);
-  document.getElementById('new-question').value='';
-  document.getElementById('create-error').textContent='';
-  document.getElementById('odds-yes').value='';
-  document.getElementById('odds-no').value='';
-  oddsEnabled=false;
-  document.getElementById('odds-toggle-box').className='odds-toggle-box';
-  document.getElementById('odds-section').className='odds-section';
+/* ── Odds Toggle (Create Modal) ───────────────── */
+window.toggleOdds = function() {
+  oddsEnabled = !oddsEnabled;
+  const tog = document.getElementById('odds-toggle');
+  const inp = document.getElementById('odds-inputs');
+  tog.classList.toggle('active', oddsEnabled);
+  inp.classList.toggle('visible', oddsEnabled);
+  if (!oddsEnabled) {
+    document.getElementById('odds-yes').value = '';
+    document.getElementById('odds-no').value  = '';
+    document.getElementById('odds-preview').textContent = 'Trage Quoten ein, um eine Vorschau zu sehen.';
+  }
+};
+
+window.updateOddsPreview = function() {
+  const oy = parseFloat(document.getElementById('odds-yes').value);
+  const on = parseFloat(document.getElementById('odds-no').value);
+  const parts = [];
+  if (oy >= 1.01) parts.push(`10€ auf JA → <b>${(10*oy).toFixed(2)}€</b> Gewinn`);
+  if (on >= 1.01) parts.push(`10€ auf NEIN → <b>${(10*on).toFixed(2)}€</b> Gewinn`);
+  const prev = document.getElementById('odds-preview');
+  if (parts.length) {
+    prev.innerHTML = '💡 Beispiel: ' + parts.join(' &nbsp;·&nbsp; ');
+  } else {
+    prev.textContent = 'Trage Quoten ein, um eine Vorschau zu sehen.';
+  }
+};
+
+/* ── Create Bet ───────────────────────────────── */
+window.openCreateModal = async function() {
+  try {
+    const snap = await getDoc(doc(db,'users',currentUser));
+    const u = snap.data(), today = todayStr();
+    if (u.lastBetDate !== today) {
+      await updateDoc(doc(db,'users',currentUser), { betsMadeToday:0, lastBetDate:today });
+      u.betsMadeToday = 0;
+    }
+    if (u.betsMadeToday >= 2) { toast('Du hast heute bereits 2 Wetten eröffnet!', 'error'); return; }
+  } catch(e) { toast('Fehler: ' + e.message, 'error'); return; }
+
+  const now = new Date();
+  const mc  = new Date(now.getTime() + 86400000);
+  const me  = new Date(mc.getTime()  + 3600000);
+  document.getElementById('new-bet-close').value = toInput(mc);
+  document.getElementById('new-bet-end').value   = toInput(me);
+  document.getElementById('new-question').value  = '';
+  document.getElementById('create-error').textContent = '';
+  document.getElementById('odds-yes').value = '';
+  document.getElementById('odds-no').value  = '';
+  document.getElementById('odds-preview').textContent = 'Trage Quoten ein, um eine Vorschau zu sehen.';
+  oddsEnabled = false;
+  document.getElementById('odds-toggle').classList.remove('active');
+  document.getElementById('odds-inputs').classList.remove('visible');
   document.getElementById('create-overlay').classList.add('open');
 };
 
-window.closeCreateModal=function(){document.getElementById('create-overlay').classList.remove('open');};
-
-window.createBet=async function(){
-  const q=document.getElementById('new-question').value.trim();
-  const cs=document.getElementById('new-bet-close').value;
-  const es=document.getElementById('new-bet-end').value;
-  const err=document.getElementById('create-error');
-  if(!q){err.textContent='Bitte eine Frage eingeben';return;}
-  if(!cs||!es){err.textContent='Bitte alle Daten ausfüllen';return;}
-  const now=Date.now(),cd=new Date(cs).getTime(),ed=new Date(es).getTime();
-  if(cd<now+82800000){err.textContent='Annahmeschluss muss mindestens 1 Tag in der Zukunft liegen';return;}
-  if(ed<=cd){err.textContent='Enddatum muss nach dem Annahmeschluss liegen';return;}
-  let oddsYes=null,oddsNo=null;
-  if(oddsEnabled){
-    const oy=parseFloat(document.getElementById('odds-yes').value);
-    const on=parseFloat(document.getElementById('odds-no').value);
-    if(!oy&&!on){err.textContent='Bitte mindestens eine Quote eingeben';return;}
-    if(oy&&oy<1.01){err.textContent='Quote JA muss mindestens 1.01 sein';return;}
-    if(on&&on<1.01){err.textContent='Quote NEIN muss mindestens 1.01 sein';return;}
-    if(oy)oddsYes=Math.round(oy*100)/100;
-    if(on)oddsNo=Math.round(on*100)/100;
-  }
-  try{
-    const snap=await getDoc(doc(db,'users',currentUser));
-    const u=snap.data(),today=todayStr();
-    const made=u.lastBetDate===today?u.betsMadeToday:0;
-    if(made>=2){err.textContent='Tageslimit (2 Wetten) erreicht';return;}
-    const betData={question:q,creator:currentUser,createdAt:now,closeDate:cd,endDate:ed,resolved:false,winner:null,stakeYes:0,stakeNo:0,participants:{},history:{[String(now)]:{yesTotal:0,noTotal:0}}};
-    if(oddsYes!==null)betData.oddsYes=oddsYes;
-    if(oddsNo!==null)betData.oddsNo=oddsNo;
-    await addDoc(collection(db,'bets'),betData);
-    await updateDoc(doc(db,'users',currentUser),{betsMadeToday:made+1,lastBetDate:today});
-    closeCreateModal();
-    toast('Wette eröffnet! 🎯'+(oddsEnabled?' (Feste Quoten)':''),'success');
-  }catch(e){err.textContent='Fehler: '+e.message;}
+window.closeCreateModal = function() {
+  document.getElementById('create-overlay').classList.remove('open');
 };
 
-window.openDetailModal=function(id){
-  currentDetailBetId=id;selectedVote=null;
-  const bet=allBets.find(b=>b.id===id);
-  if(!bet)return;
-  const st=betStatus(bet);
-  const total=(bet.stakeYes||0)+(bet.stakeNo||0);
-  const isFixed=!!(bet.oddsYes||bet.oddsNo);
-  const yesPct=total>0?Math.round((bet.stakeYes||0)/total*100):50;
-  const noPct=100-yesPct;
-  const isMine=bet.creator===currentUser;
-  const parts=bet.participants?Object.values(bet.participants):[];
-  const didBet=parts.some(p=>p.user===currentUser);
-  const myBet=parts.find(p=>p.user===currentUser);
-  setTxt('det-question',bet.question);
-  const be=document.getElementById('det-badges');be.innerHTML='';
-  const sb=document.createElement('span');
-  sb.className='badge badge-'+(st==='resolved'?'resolved':st);
-  sb.textContent={open:'🟢 Offen',closed:'🔴 Annahme geschlossen',ended:'⏱ Beendet',resolved:'✓ '+(bet.winner==='yes'?'JA gewonnen':'NEIN gewonnen')}[st];
-  be.appendChild(sb);
-  if(isFixed){const fb=document.createElement('span');fb.className='badge badge-fixed';fb.textContent='📊 Feste Quote';be.appendChild(fb);}
-  if(isMine){const m=document.createElement('span');m.className='badge badge-mine';m.textContent='⚙ Meine Wette';be.appendChild(m);}
-  const banner=document.getElementById('det-fixed-odds-banner');
-  if(isFixed){banner.innerHTML='<div class="fixed-odds-banner">📊 Feste Quoten: <strong>'+(bet.oddsYes?bet.oddsYes.toFixed(2)+'x':'—')+'</strong> für JA &nbsp;·&nbsp; <strong>'+(bet.oddsNo?bet.oddsNo.toFixed(2)+'x':'—')+'</strong> für NEIN</div>';}
-  else{banner.innerHTML='';}
-  document.getElementById('det-info').innerHTML=
-    '<div class="info-row"><span class="key">Ersteller</span><span class="val">'+esc(bet.creator)+'</span></div>'
-    +'<div class="info-row"><span class="key">Annahme bis</span><span class="val">'+fmtDate(bet.closeDate)+'</span></div>'
-    +'<div class="info-row"><span class="key">Endet am</span><span class="val">'+fmtDate(bet.endDate)+'</span></div>'
-    +'<div class="info-row"><span class="key">Gesamteinsatz</span><span class="val">'+fmtMoney(total)+'</span></div>'
-    +'<div class="info-row"><span class="key">Teilnehmer</span><span class="val">'+parts.length+'</span></div>'
-    +(isFixed?'<div class="info-row"><span class="key">Quote JA</span><span class="val" style="color:var(--yes)">'+(bet.oddsYes?bet.oddsYes.toFixed(2)+'x':'—')+'</span></div>'
-    +'<div class="info-row"><span class="key">Quote NEIN</span><span class="val" style="color:var(--no)">'+(bet.oddsNo?bet.oddsNo.toFixed(2)+'x':'—')+'</span></div>':'')
-    +(bet.resolved?'<div class="info-row"><span class="key">Ergebnis</span><span class="val" style="color:'+(bet.winner==='yes'?'var(--yes)':'var(--no)')+'">'+( bet.winner==='yes'?'✓ JA':'✗ NEIN')+'</span></div>':'');
-  setTxt('det-yes-pct','JA '+(isFixed&&bet.oddsYes?bet.oddsYes.toFixed(2)+'x':yesPct+'%'));
-  setTxt('det-no-pct',(isFixed&&bet.oddsNo?bet.oddsNo.toFixed(2)+'x':noPct+'%')+' NEIN');
-  document.getElementById('det-split-yes').style.width=yesPct+'%';
-  document.getElementById('det-split-no').style.width=noPct+'%';
-  const btnY=document.getElementById('vote-btn-yes');
-  const btnN=document.getElementById('vote-btn-no');
-  btnY.innerHTML=isFixed&&bet.oddsYes?'JA<span class="btn-odds">'+bet.oddsYes.toFixed(2)+'x</span>':'JA';
-  btnN.innerHTML=isFixed&&bet.oddsNo?'NEIN<span class="btn-odds">'+bet.oddsNo.toFixed(2)+'x</span>':'NEIN';
-  // disable vote btns for sides without odds in fixed mode
-  if(isFixed){
-    btnY.disabled=!bet.oddsYes;btnY.style.opacity=bet.oddsYes?'1':'0.35';
-    btnN.disabled=!bet.oddsNo;btnN.style.opacity=bet.oddsNo?'1':'0.35';
-  }else{btnY.disabled=false;btnN.disabled=false;btnY.style.opacity='';btnN.style.opacity='';}
-  document.querySelectorAll('.vote-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('bet-amount').value='';
-  setTxt('payout-val','— €');setTxt('bet-error','');
-  document.getElementById('det-msg-text').style.color='';
-  ['det-vote-section','det-resolve-section','det-msg-section','det-delete-section'].forEach(hideEl);
-  if(st==='open'){
-    if(isMine){showEl('det-msg-section');setTxt('det-msg-text','Du kannst nicht auf deine eigene Wette wetten.');showEl('det-delete-section');}
-    else if(didBet){showEl('det-msg-section');setTxt('det-msg-text','Du hast bereits '+fmtMoney(myBet.amount)+' auf "'+(myBet.side==='yes'?'JA':'NEIN')+'" gesetzt.');}
-    else{showEl('det-vote-section');}
-  }else if(st==='ended'&&isMine&&!bet.resolved){
-    showEl('det-resolve-section');showEl('det-msg-section');setTxt('det-msg-text','Die Wette ist beendet. Lege das Ergebnis fest!');
-  }else if(st==='closed'){
-    showEl('det-msg-section');setTxt('det-msg-text','Annahmeschluss vorbei. Keine neuen Einsätze möglich.');
-    if(isMine)showEl('det-delete-section');
-  }else if(st==='ended'&&!isMine){
-    showEl('det-msg-section');setTxt('det-msg-text','Warte auf Entscheidung des Erstellers...');
-  }else if(st==='resolved'){
-    showEl('det-msg-section');
-    if(myBet){const won=myBet.side===bet.winner;setTxt('det-msg-text',won?'🎉 Du hast gewonnen!':'Du hast leider verloren.');document.getElementById('det-msg-text').style.color=won?'var(--yes)':'var(--no)';}
-    else setTxt('det-msg-text','Wette aufgelöst.');
+window.createBet = async function() {
+  const q   = document.getElementById('new-question').value.trim();
+  const cs  = document.getElementById('new-bet-close').value;
+  const es  = document.getElementById('new-bet-end').value;
+  const err = document.getElementById('create-error');
+  if (!q)       { err.textContent = 'Bitte eine Frage eingeben'; return; }
+  if (!cs||!es) { err.textContent = 'Bitte alle Daten ausfüllen'; return; }
+
+  const now = Date.now();
+  const cd  = new Date(cs).getTime();
+  const ed  = new Date(es).getTime();
+  if (cd < now + 82800000) { err.textContent = 'Annahmeschluss muss mindestens 1 Tag in der Zukunft liegen'; return; }
+  if (ed <= cd)             { err.textContent = 'Enddatum muss nach dem Annahmeschluss liegen'; return; }
+
+  // Validate odds
+  let oddsYes = null, oddsNo = null;
+  if (oddsEnabled) {
+    const oy = parseFloat(document.getElementById('odds-yes').value);
+    const on = parseFloat(document.getElementById('odds-no').value);
+    if (!oy && !on) { err.textContent = 'Bitte mindestens eine Quote eingeben'; return; }
+    if (oy && oy < 1.01) { err.textContent = 'Quote JA muss ≥ 1.01 sein'; return; }
+    if (on && on < 1.01) { err.textContent = 'Quote NEIN muss ≥ 1.01 sein'; return; }
+    if (oy) oddsYes = Math.round(oy * 100) / 100;
+    if (on) oddsNo  = Math.round(on * 100) / 100;
   }
+
+  try {
+    const snap  = await getDoc(doc(db,'users',currentUser));
+    const u     = snap.data(), today = todayStr();
+    const made  = u.lastBetDate === today ? u.betsMadeToday : 0;
+    if (made >= 2) { err.textContent = 'Tageslimit (2 Wetten) erreicht'; return; }
+
+    const betData = {
+      question: q, creator: currentUser, createdAt: now,
+      closeDate: cd, endDate: ed,
+      resolved: false, winner: null,
+      stakeYes: 0, stakeNo: 0,
+      participants: {},
+      history: { [String(now)]: { yesTotal:0, noTotal:0 } }
+    };
+    if (oddsYes !== null) betData.oddsYes = oddsYes;
+    if (oddsNo  !== null) betData.oddsNo  = oddsNo;
+
+    await addDoc(collection(db,'bets'), betData);
+    await updateDoc(doc(db,'users',currentUser), { betsMadeToday: made+1, lastBetDate: today });
+    closeCreateModal();
+    toast('Wette eröffnet! 🎯' + (oddsEnabled ? ' (Feste Quoten)' : ''), 'success');
+  } catch(e) { err.textContent = 'Fehler: ' + e.message; }
+};
+
+/* ── Detail Modal ─────────────────────────────── */
+window.openDetailModal = function(id, preSelectSide) {
+  currentDetailBetId = id;
+  selectedVote = preSelectSide || null;
+
+  const bet = allBets.find(b => b.id === id);
+  if (!bet) return;
+
+  const st      = betStatus(bet);
+  const total   = (bet.stakeYes||0) + (bet.stakeNo||0);
+  const isFixed = !!(bet.oddsYes || bet.oddsNo);
+  const yesPct  = total > 0 ? Math.round((bet.stakeYes||0) / total * 100) : 50;
+  const noPct   = 100 - yesPct;
+  const isMine  = bet.creator === currentUser;
+  const parts   = bet.participants ? Object.values(bet.participants) : [];
+  const didBet  = parts.some(p => p.user === currentUser);
+  const myBet   = parts.find(p => p.user === currentUser);
+
+  // Header
+  setTxt('det-question', bet.question);
+  const be = document.getElementById('det-badges');
+  be.innerHTML = '';
+  const addBadge = (cls, txt) => {
+    const s = document.createElement('span');
+    s.className = 'badge ' + cls;
+    s.textContent = txt;
+    be.appendChild(s);
+  };
+  addBadge('badge-' + (st==='resolved'?'resolved':st),
+    { open:'🟢 Offen', closed:'🔴 Annahme geschlossen',
+      ended:'⏱ Beendet', resolved:'✓ '+(bet.winner==='yes'?'JA':'NEIN')+' gewonnen' }[st]);
+  if (isFixed) addBadge('', '📊 Feste Quoten');
+  if (isMine)  addBadge('badge-mine', '⚙ Meine Wette');
+
+  // Info rows
+  document.getElementById('det-info').innerHTML = `
+    <div class="info-row"><span class="key">Ersteller</span>   <span class="val">${esc(bet.creator)}</span></div>
+    <div class="info-row"><span class="key">Pot gesamt</span>  <span class="val">${fmtMoney(total)}</span></div>
+    <div class="info-row"><span class="key">Tipper</span>      <span class="val">${parts.length}</span></div>
+    <div class="info-row"><span class="key">Annahme bis</span> <span class="val">${fmtDate(bet.closeDate)}</span></div>
+    <div class="info-row"><span class="key">Endet am</span>    <span class="val">${fmtDate(bet.endDate)}</span></div>
+    ${isFixed ? `
+    <div class="info-row"><span class="key">Quote JA</span>   <span class="val" style="color:var(--yes)">${bet.oddsYes?bet.oddsYes.toFixed(2)+'x':'—'}</span></div>
+    <div class="info-row"><span class="key">Quote NEIN</span> <span class="val" style="color:var(--no)">${bet.oddsNo?bet.oddsNo.toFixed(2)+'x':'—'}</span></div>` : `
+    <div class="info-row"><span class="key">JA</span>   <span class="val" style="color:var(--yes)">${yesPct}% · ${fmtMoney(bet.stakeYes||0)}</span></div>
+    <div class="info-row"><span class="key">NEIN</span> <span class="val" style="color:var(--no)">${noPct}% · ${fmtMoney(bet.stakeNo||0)}</span></div>`}
+    ${bet.resolved ? `
+    <div class="info-row"><span class="key">Ergebnis</span>
+      <span class="val" style="color:${bet.winner==='yes'?'var(--yes)':'var(--no)'}">
+        ${bet.winner==='yes'?'✓ JA':'✗ NEIN'}
+      </span>
+    </div>` : ''}`;
+
+  // Sidebar vote buttons
+  const sobYes = document.getElementById('sob-yes');
+  const sobNo  = document.getElementById('sob-no');
+
+  if (isFixed) {
+    // Fixed: show actual odds value
+    setTxt('sob-yes-val', bet.oddsYes ? bet.oddsYes.toFixed(2) + 'x' : '—');
+    setTxt('sob-no-val',  bet.oddsNo  ? bet.oddsNo.toFixed(2)  + 'x' : '—');
+    setTxt('sob-yes-sub', bet.oddsYes ? 'Feste Quote' : 'Nicht verfügbar');
+    setTxt('sob-no-sub',  bet.oddsNo  ? 'Feste Quote' : 'Nicht verfügbar');
+    sobYes.disabled = !bet.oddsYes;
+    sobNo.disabled  = !bet.oddsNo;
+  } else {
+    // Dynamic parimutuel: show implied odds AS the main value (sportwetten-style)
+    // Implied odds = total pool / stake on that side (if you bet now)
+    // We show current implied odds; sub shows the % split
+    const yStake = bet.stakeYes || 0;
+    const nStake = bet.stakeNo  || 0;
+    // Implied: if someone bets 1€ now, what's the current pool ratio?
+    // Conservative: based on current pool without their bet
+    const impliedYes = total > 0 && yStake > 0
+      ? (total / yStake).toFixed(2)
+      : '2.00';  // default 50/50 when no bets yet
+    const impliedNo = total > 0 && nStake > 0
+      ? (total / nStake).toFixed(2)
+      : '2.00';
+    setTxt('sob-yes-val', impliedYes + 'x');
+    setTxt('sob-no-val',  impliedNo  + 'x');
+    setTxt('sob-yes-sub', yesPct + '% · ' + fmtMoney(yStake));
+    setTxt('sob-no-sub',  noPct  + '% · ' + fmtMoney(nStake));
+    sobYes.disabled = false;
+    sobNo.disabled  = false;
+  }
+
+  // Activate pre-selected side
+  document.querySelectorAll('.sport-odds-btn').forEach(b => b.classList.remove('active'));
+  if (selectedVote) {
+    const activeBtn = document.getElementById('sob-' + selectedVote);
+    if (activeBtn && !activeBtn.disabled) activeBtn.classList.add('active');
+  }
+  document.getElementById('btn-place').textContent = 'Wette platzieren';
+  document.getElementById('betslip-selection').style.display = 'none';
+  if (preSelectSide) selectVote(preSelectSide);
+
+  // Show/hide sidebar sections
+  ['det-vote-section','det-resolve-section','det-msg-section','det-delete-section'].forEach(hideEl);
+
+  if (st === 'open') {
+    if (isMine) {
+      showEl('det-msg-section');
+      setTxt('det-msg-text', 'Du kannst nicht auf deine eigene Wette wetten.');
+      showEl('det-delete-section');
+    } else if (didBet) {
+      showEl('det-msg-section');
+      setTxt('det-msg-text',
+        'Du hast ' + fmtMoney(myBet.amount) + ' auf "' + (myBet.side==='yes'?'JA':'NEIN') + '" gesetzt.\n' +
+        (isFixed ? 'Möglicher Gewinn: ' + fmtMoney(myBet.amount * (myBet.side==='yes'?bet.oddsYes:bet.oddsNo)) : '')
+      );
+    } else {
+      showEl('det-vote-section');
+    }
+  } else if (st === 'ended' && isMine && !bet.resolved) {
+    showEl('det-resolve-section');
+    showEl('det-msg-section');
+    setTxt('det-msg-text', 'Die Wette ist beendet. Lege jetzt das Ergebnis fest!');
+  } else if (st === 'closed') {
+    showEl('det-msg-section');
+    setTxt('det-msg-text', 'Annahmeschluss vorbei — keine neuen Einsätze möglich.');
+    if (isMine) showEl('det-delete-section');
+  } else if (st === 'ended' && !isMine) {
+    showEl('det-msg-section');
+    setTxt('det-msg-text', 'Warte auf Entscheidung des Erstellers...');
+  } else if (st === 'resolved') {
+    showEl('det-msg-section');
+    if (myBet) {
+      const won = myBet.side === bet.winner;
+      let msg = won ? '🎉 Du hast gewonnen!' : '😔 Du hast leider verloren.';
+      if (won && isFixed) {
+        const odds = myBet.side==='yes' ? bet.oddsYes : bet.oddsNo;
+        msg += '\n+' + fmtMoney(myBet.amount * odds - myBet.amount) + ' Profit';
+      }
+      document.getElementById('det-msg-text').textContent = msg;
+      document.getElementById('det-msg-text').style.color = won ? 'var(--yes)' : 'var(--no)';
+    } else {
+      setTxt('det-msg-text', 'Wette aufgelöst.');
+      document.getElementById('det-msg-text').style.color = '';
+    }
+  }
+
   buildCharts(bet);
   document.getElementById('detail-overlay').classList.add('open');
 };
 
-window.closeDetailModal=function(){
+window.closeDetailModal = function() {
   document.getElementById('detail-overlay').classList.remove('open');
-  if(volumeChart){volumeChart.destroy();volumeChart=null;}
-  if(splitChart){splitChart.destroy();splitChart=null;}
+  if (volumeChart) { volumeChart.destroy(); volumeChart = null; }
+  if (splitChart)  { splitChart.destroy();  splitChart  = null; }
 };
 
-function buildCharts(bet){
-  if(volumeChart){volumeChart.destroy();volumeChart=null;}
-  if(splitChart){splitChart.destroy();splitChart=null;}
-  const hist=bet.history?Object.entries(bet.history).sort((a,b)=>Number(a[0])-Number(b[0])):[[String(bet.createdAt),{yesTotal:0,noTotal:0}]];
-  const labels=hist.map(([t])=>fmtShort(Number(t)));
-  const vols=hist.map(([,h])=>(h.yesTotal||0)+(h.noTotal||0));
-  const yps=hist.map(([,h])=>{const t=(h.yesTotal||0)+(h.noTotal||0);return t>0?Math.round((h.yesTotal||0)/t*100):50;});
-  const nps=yps.map(p=>100-p);
-  const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#12121a',borderColor:'#2a2a3d',borderWidth:1,titleColor:'#e8e8f0',bodyColor:'#6b6b8a'}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6b6b8a',font:{family:'Space Mono',size:9},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6b6b8a',font:{family:'Space Mono',size:9}}}}};
-  volumeChart=new Chart(document.getElementById('chart-volume').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'€',data:vols,borderColor:'#7b61ff',backgroundColor:'rgba(123,97,255,.1)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#7b61ff'}]},options:{...base}});
-  splitChart=new Chart(document.getElementById('chart-split').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'JA %',data:yps,borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.08)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#00ff88'},{label:'NEIN %',data:nps,borderColor:'#ff3366',backgroundColor:'rgba(255,51,102,.08)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#ff3366'}]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{color:'#6b6b8a',font:{family:'Space Mono',size:10}}}},scales:{...base.scales,y:{...base.scales.y,min:0,max:100}}}});
+/* ── Charts ───────────────────────────────────── */
+function buildCharts(bet) {
+  if (volumeChart) { volumeChart.destroy(); volumeChart = null; }
+  if (splitChart)  { splitChart.destroy();  splitChart  = null; }
+
+  const hist = bet.history
+    ? Object.entries(bet.history).sort((a,b) => Number(a[0]) - Number(b[0]))
+    : [[String(bet.createdAt), { yesTotal:0, noTotal:0 }]];
+
+  const labels  = hist.map(([t])    => fmtShort(Number(t)));
+  const vols    = hist.map(([,h])   => (h.yesTotal||0) + (h.noTotal||0));
+  const yesPcts = hist.map(([,h])   => {
+    const t = (h.yesTotal||0) + (h.noTotal||0);
+    return t > 0 ? Math.round((h.yesTotal||0) / t * 100) : 50;
+  });
+  const noPcts = yesPcts.map(p => 100 - p);
+
+  const base = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor:'#12121a', borderColor:'#2a2a3d', borderWidth:1, titleColor:'#e8e8f0', bodyColor:'#6b6b8a' }
+    },
+    scales: {
+      x: { grid:{ color:'rgba(255,255,255,.04)' }, ticks:{ color:'#6b6b8a', font:{ family:'Space Mono', size:9 }, maxTicksLimit:6 }},
+      y: { grid:{ color:'rgba(255,255,255,.04)' }, ticks:{ color:'#6b6b8a', font:{ family:'Space Mono', size:9 }}}
+    }
+  };
+
+  volumeChart = new Chart(document.getElementById('chart-volume').getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets: [{
+      label: '€', data: vols,
+      borderColor:'#7b61ff', backgroundColor:'rgba(123,97,255,.1)',
+      borderWidth:2, fill:true, tension:.4, pointRadius:3, pointBackgroundColor:'#7b61ff'
+    }]},
+    options: { ...base }
+  });
+  splitChart = new Chart(document.getElementById('chart-split').getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets: [
+      { label:'JA %',   data:yesPcts, borderColor:'#00ff88', backgroundColor:'rgba(0,255,136,.08)',   borderWidth:2, fill:true, tension:.4, pointRadius:3, pointBackgroundColor:'#00ff88' },
+      { label:'NEIN %', data:noPcts,  borderColor:'#ff3366', backgroundColor:'rgba(255,51,102,.08)', borderWidth:2, fill:true, tension:.4, pointRadius:3, pointBackgroundColor:'#ff3366' }
+    ]},
+    options: {
+      ...base,
+      plugins: { ...base.plugins, legend:{ display:true, labels:{ color:'#6b6b8a', font:{ family:'Space Mono', size:10 }}}},
+      scales:  { ...base.scales, y: { ...base.scales.y, min:0, max:100 }}
+    }
+  });
 }
 
-window.selectVote=function(side){
-  selectedVote=side;
-  document.querySelectorAll('.vote-btn').forEach(b=>b.classList.remove('active'));
-  const btn=document.querySelector('.vote-btn.'+side);
-  if(btn&&!btn.disabled)btn.classList.add('active');
+/* ── Betting ──────────────────────────────────── */
+window.selectVote = function(side) {
+  selectedVote = side;
+  document.querySelectorAll('.sport-odds-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('sob-' + side);
+  if (btn && !btn.disabled) btn.classList.add('active');
+
+  // Show betslip selection indicator
+  const bet = allBets.find(b => b.id === currentDetailBetId);
+  const isFixed = !!(bet.oddsYes || bet.oddsNo);
+  const sel = document.getElementById('betslip-selection');
+  sel.style.display = 'flex';
+  sel.style.borderColor = side === 'yes' ? 'rgba(0,255,136,.4)' : 'rgba(255,51,102,.4)';
+  document.getElementById('betslip-side-icon').textContent = side === 'yes' ? '✓' : '✗';
+  document.getElementById('betslip-side-icon').style.color = side === 'yes' ? 'var(--yes)' : 'var(--no)';
+  document.getElementById('betslip-side-txt').textContent  = side === 'yes' ? 'JA gewählt' : 'NEIN gewählt';
+  document.getElementById('betslip-side-txt').style.color  = side === 'yes' ? 'var(--yes)' : 'var(--no)';
+  // Show the odds in the betslip row
+  let oddsLabel = '';
+  if (isFixed) {
+    const odds = side === 'yes' ? bet.oddsYes : bet.oddsNo;
+    oddsLabel = odds ? odds.toFixed(2) + 'x' : '';
+  } else {
+    const total = (bet.stakeYes||0) + (bet.stakeNo||0);
+    const stake = side === 'yes' ? (bet.stakeYes||0) : (bet.stakeNo||0);
+    oddsLabel = total > 0 && stake > 0 ? '~' + (total / stake).toFixed(2) + 'x' : '~2.00x';
+  }
+  document.getElementById('betslip-odds-txt').textContent = oddsLabel;
+
+  updatePayout();
+  // Auto-focus amount input
+  setTimeout(() => {
+    const inp = document.getElementById('bet-amount');
+    if (inp) { inp.focus(); inp.select(); }
+  }, 50);
+};
+
+window.setAmount = function(amt) {
+  document.getElementById('bet-amount').value = amt;
   updatePayout();
 };
 
-window.updatePayout=function(){
-  if(!currentDetailBetId||!selectedVote){setTxt('payout-val','— €');return;}
-  const amt=parseFloat(document.getElementById('bet-amount').value)||0;
-  if(amt<=0){setTxt('payout-val','— €');return;}
-  const bet=allBets.find(b=>b.id===currentDetailBetId);
-  const isFixed=!!(bet.oddsYes||bet.oddsNo);
-  let payout;
-  if(isFixed){
-    const odds=selectedVote==='yes'?bet.oddsYes:bet.oddsNo;
-    payout=odds?amt*odds:amt;
-  }else{
-    const yT=(bet.stakeYes||0)+(selectedVote==='yes'?amt:0);
-    const nT=(bet.stakeNo||0)+(selectedVote==='no'?amt:0);
-    const tot=yT+nT,st=selectedVote==='yes'?yT:nT;
-    payout=st>0?(tot/st)*amt:amt;
+window.setAmountMax = function() {
+  document.getElementById('bet-amount').value = Math.floor(currentUserBalance);
+  updatePayout();
+};
+
+window.updatePayout = function() {
+  const amt      = parseFloat(document.getElementById('bet-amount').value) || 0;
+  const btnPlace = document.getElementById('btn-place');
+  const errEl    = document.getElementById('bet-error');
+
+  if (!selectedVote || amt <= 0) {
+    setTxt('payout-total',  '— €');
+    setTxt('payout-profit', '— €');
+    btnPlace.disabled = true;
+    return;
   }
-  setTxt('payout-val',fmtMoney(payout));
+
+  const bet     = allBets.find(b => b.id === currentDetailBetId);
+  const isFixed = !!(bet.oddsYes || bet.oddsNo);
+  let totalPayout, profit, displayOdds;
+
+  if (isFixed) {
+    const odds  = selectedVote === 'yes' ? bet.oddsYes : bet.oddsNo;
+    displayOdds = odds;
+    totalPayout = odds ? amt * odds : amt;
+    profit      = totalPayout - amt;
+  } else {
+    // Parimutuel: recalculate WITH this bet included
+    const yT    = (bet.stakeYes||0) + (selectedVote==='yes' ? amt : 0);
+    const nT    = (bet.stakeNo||0)  + (selectedVote==='no'  ? amt : 0);
+    const tot   = yT + nT;
+    const mySt  = selectedVote==='yes' ? yT : nT;
+    totalPayout = mySt > 0 ? (tot / mySt) * amt : amt;
+    profit      = totalPayout - amt;
+    displayOdds = mySt > 0 ? tot / mySt : 1;
+  }
+
+  // Update payout box with odds shown
+  document.getElementById('payout-total').textContent  = fmtMoney(totalPayout);
+  document.getElementById('payout-profit').textContent = '+' + fmtMoney(profit);
+
+  // Update the btn-place text to show the betslip summary
+  const oddsStr = displayOdds ? displayOdds.toFixed(2) + 'x' : '';
+  btnPlace.textContent = amt >= 1
+    ? `${fmtMoney(amt)} auf ${selectedVote==='yes'?'JA':'NEIN'} @ ${oddsStr} → ${fmtMoney(totalPayout)}`
+    : 'Wette platzieren';
+
+  const valid = amt >= 1 && amt <= currentUserBalance;
+  btnPlace.disabled = !valid;
+  errEl.textContent = amt > currentUserBalance
+    ? 'Nicht genug Guthaben — max. ' + fmtMoney(currentUserBalance)
+    : '';
 };
 
-window.placeBet=async function(){
-  const err=document.getElementById('bet-error');
-  if(!selectedVote){err.textContent='Bitte JA oder NEIN wählen';return;}
-  const amt=parseFloat(document.getElementById('bet-amount').value);
-  if(!amt||amt<1){err.textContent='Mindestens 1€ Einsatz';return;}
-  try{
-    const bet=allBets.find(b=>b.id===currentDetailBetId);
-    const snap=await getDoc(doc(db,'users',currentUser));
-    const u=snap.data();
-    if(amt>u.balance){err.textContent='Nicht genug Guthaben';return;}
-    const nb=Math.round((u.balance-amt)*100)/100;
-    const sf=selectedVote==='yes'?'stakeYes':'stakeNo';
-    const ns=Math.round(((bet[sf]||0)+amt)*100)/100;
-    const now=Date.now();
-    await updateDoc(doc(db,'users',currentUser),{balance:nb});
-    await updateDoc(doc(db,'bets',bet.id),{
-      [sf]:ns,
-      ['participants.'+currentUser]:{user:currentUser,side:selectedVote,amount:amt,time:now},
-      ['history.'+now]:{yesTotal:selectedVote==='yes'?ns:(bet.stakeYes||0),noTotal:selectedVote==='no'?ns:(bet.stakeNo||0)}
+window.placeBet = async function() {
+  const err = document.getElementById('bet-error');
+  if (!selectedVote) { err.textContent = 'Bitte JA oder NEIN wählen'; return; }
+  const amt = parseFloat(document.getElementById('bet-amount').value);
+  if (!amt || amt < 1)       { err.textContent = 'Mindestens 1€ Einsatz'; return; }
+
+  try {
+    const bet  = allBets.find(b => b.id === currentDetailBetId);
+    const snap = await getDoc(doc(db,'users',currentUser));
+    const u    = snap.data();
+    if (amt > u.balance) { err.textContent = 'Nicht genug Guthaben'; return; }
+
+    const nb  = Math.round((u.balance - amt) * 100) / 100;
+    const sf  = selectedVote === 'yes' ? 'stakeYes' : 'stakeNo';
+    const ns  = Math.round(((bet[sf]||0) + amt) * 100) / 100;
+    const now = Date.now();
+
+    await updateDoc(doc(db,'users',currentUser), { balance: nb });
+    await updateDoc(doc(db,'bets',bet.id), {
+      [sf]: ns,
+      ['participants.' + currentUser]: { user:currentUser, side:selectedVote, amount:amt, time:now },
+      ['history.' + now]: {
+        yesTotal: selectedVote==='yes' ? ns : (bet.stakeYes||0),
+        noTotal:  selectedVote==='no'  ? ns : (bet.stakeNo||0)
+      }
     });
+
     closeDetailModal();
-    toast(fmtMoney(amt)+' auf "'+(selectedVote==='yes'?'JA':'NEIN')+'" gesetzt! 🎯','success');
-  }catch(e){err.textContent='Fehler: '+e.message;}
+    const isFixed = !!(bet.oddsYes || bet.oddsNo);
+    const odds    = isFixed ? (selectedVote==='yes' ? bet.oddsYes : bet.oddsNo) : null;
+    const payoutStr = odds
+      ? ' → mögliche ' + fmtMoney(amt * odds)
+      : '';
+    toast(fmtMoney(amt) + ' auf "' + (selectedVote==='yes'?'JA':'NEIN') + '"' + payoutStr + ' 🎯', 'success');
+  } catch(e) { err.textContent = 'Fehler: ' + e.message; }
 };
 
-window.resolveBet=async function(winner){
-  const bet=allBets.find(b=>b.id===currentDetailBetId);
-  if(!bet||bet.resolved)return;
-  try{
-    const parts=bet.participants?Object.values(bet.participants):[];
-    const winners=parts.filter(p=>p.side===winner);
-    const isFixed=!!(bet.oddsYes||bet.oddsNo);
-    await updateDoc(doc(db,'bets',bet.id),{resolved:true,winner:winner,resolvedAt:Date.now()});
-    if(winners.length===0){
-      for(const p of parts){const s=await getDoc(doc(db,'users',p.user));if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+p.amount)*100)/100});}
-      toast('Keine Gewinner — Einsätze zurückerstattet.','info');
-    }else if(isFixed){
-      const odds=winner==='yes'?bet.oddsYes:bet.oddsNo;
-      for(const p of winners){
-        const payout=odds?Math.round(p.amount*odds*100)/100:p.amount;
-        const s=await getDoc(doc(db,'users',p.user));
-        if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+payout)*100)/100});
+/* ── Resolve ──────────────────────────────────── */
+window.resolveBet = async function(winner) {
+  const bet = allBets.find(b => b.id === currentDetailBetId);
+  if (!bet || bet.resolved) return;
+  try {
+    const parts   = bet.participants ? Object.values(bet.participants) : [];
+    const winners = parts.filter(p => p.side === winner);
+    const isFixed = !!(bet.oddsYes || bet.oddsNo);
+
+    await updateDoc(doc(db,'bets',bet.id), { resolved:true, winner, resolvedAt:Date.now() });
+
+    if (winners.length === 0) {
+      // Refund everyone
+      for (const p of parts) {
+        const s = await getDoc(doc(db,'users',p.user));
+        if (s.exists()) await updateDoc(doc(db,'users',p.user), {
+          balance: Math.round((s.data().balance + p.amount) * 100) / 100
+        });
       }
-      toast('Wette aufgelöst! '+(winner==='yes'?'JA':'NEIN')+' gewinnt! 🎉','success');
-    }else{
-      const sw=winner==='yes'?(bet.stakeYes||0):(bet.stakeNo||0);
-      const tot=(bet.stakeYes||0)+(bet.stakeNo||0);
-      for(const p of winners){
-        const payout=sw>0?Math.round((tot/sw)*p.amount*100)/100:p.amount;
-        const s=await getDoc(doc(db,'users',p.user));
-        if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+payout)*100)/100});
+      toast('Keine Gewinner — alle Einsätze zurückerstattet.', 'info');
+    } else if (isFixed) {
+      // Fixed odds: each winner gets stake × their odds
+      const odds = winner === 'yes' ? bet.oddsYes : bet.oddsNo;
+      for (const p of winners) {
+        const payout = odds ? Math.round(p.amount * odds * 100) / 100 : p.amount;
+        const s = await getDoc(doc(db,'users',p.user));
+        if (s.exists()) await updateDoc(doc(db,'users',p.user), {
+          balance: Math.round((s.data().balance + payout) * 100) / 100
+        });
       }
-      toast('Wette aufgelöst! '+(winner==='yes'?'JA':'NEIN')+' gewinnt! 🎉','success');
+      toast('Wette aufgelöst! ' + (winner==='yes'?'JA':'NEIN') + ' gewinnt! 🎉', 'success');
+    } else {
+      // Parimutuel: entire pool split among winners proportionally
+      const sw  = winner==='yes' ? (bet.stakeYes||0) : (bet.stakeNo||0);
+      const tot = (bet.stakeYes||0) + (bet.stakeNo||0);
+      for (const p of winners) {
+        const payout = sw > 0 ? Math.round((tot / sw) * p.amount * 100) / 100 : p.amount;
+        const s = await getDoc(doc(db,'users',p.user));
+        if (s.exists()) await updateDoc(doc(db,'users',p.user), {
+          balance: Math.round((s.data().balance + payout) * 100) / 100
+        });
+      }
+      toast('Wette aufgelöst! ' + (winner==='yes'?'JA':'NEIN') + ' gewinnt! 🎉', 'success');
     }
     closeDetailModal();
-  }catch(e){toast('Fehler: '+e.message,'error');}
+  } catch(e) { toast('Fehler: ' + e.message, 'error'); }
 };
 
-window.deleteBet=async function(){
-  const bet=allBets.find(b=>b.id===currentDetailBetId);
-  if(!bet||bet.creator!==currentUser)return;
-  if(!confirm('Wette wirklich löschen? Alle Einsätze werden zurückerstattet.'))return;
-  try{
-    const parts=bet.participants?Object.values(bet.participants):[];
-    for(const p of parts){const s=await getDoc(doc(db,'users',p.user));if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+p.amount)*100)/100});}
+/* ── Delete ───────────────────────────────────── */
+window.deleteBet = async function() {
+  const bet = allBets.find(b => b.id === currentDetailBetId);
+  if (!bet || bet.creator !== currentUser) return;
+  if (!confirm('Wette wirklich löschen? Alle Einsätze werden zurückerstattet.')) return;
+  try {
+    const parts = bet.participants ? Object.values(bet.participants) : [];
+    for (const p of parts) {
+      const s = await getDoc(doc(db,'users',p.user));
+      if (s.exists()) await updateDoc(doc(db,'users',p.user), {
+        balance: Math.round((s.data().balance + p.amount) * 100) / 100
+      });
+    }
     await deleteDoc(doc(db,'bets',bet.id));
-    closeDetailModal();toast('Wette gelöscht. Einsätze zurückerstattet.','info');
-  }catch(e){toast('Fehler: '+e.message,'error');}
+    closeDetailModal();
+    toast('Wette gelöscht. Einsätze zurückerstattet.', 'info');
+  } catch(e) { toast('Fehler: ' + e.message, 'error'); }
 };
 
-window.closeOnOverlay=function(e,id){if(e.target.id===id){if(id==='create-overlay')closeCreateModal();else closeDetailModal();}};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCreateModal();closeDetailModal();}});
+/* ── Misc ─────────────────────────────────────── */
+window.closeOnOverlay = function(e, id) {
+  if (e.target.id === id) {
+    if (id === 'create-overlay') closeCreateModal();
+    else closeDetailModal();
+  }
+};
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeCreateModal(); closeDetailModal(); }
+});
+
 </script>
 </body>
 </html>
