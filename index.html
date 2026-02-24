@@ -258,6 +258,11 @@
         <div class="form-note">Muss nach Annahmeschluss sein</div>
       </div>
     </div>
+    <div class="input-group">
+      <label>Wettquote (optional)</label>
+      <input type="number" class="input-field" id="new-bet-odds" placeholder="z.B. 1.75 — leer lassen für dynamische Quote" min="1.01" step="0.01">
+      <div class="form-note">Feste Quote wie bei Sportwetten (z.B. 2.00 = doppelter Einsatz zurück). Leer lassen für normalen Modus.</div>
+    </div>
     <button class="btn-primary" onclick="createBet()" style="margin-top:8px">Wette eröffnen</button>
     <div class="modal-error" id="create-error"></div>
   </div>
@@ -302,6 +307,7 @@
             <span class="payout-label">Möglicher Gewinn</span>
             <span class="payout-value" id="payout-val">— €</span>
           </div>
+          <div id="det-odds-hint" style="display:none;font-size:11px;color:var(--accent3);font-family:'Space Mono',monospace;text-align:center;margin-bottom:10px;"></div>
           <div class="sidebar-label">Aktuell</div>
           <div class="current-split">
             <span class="split-yes" id="det-yes-pct">JA 50%</span>
@@ -536,6 +542,7 @@ function renderBets(){
         <div class="meta-item"><span class="meta-icon">💰</span><span class="meta-value">${fmtMoney(total)}</span> Gesamt</div>
         <div class="meta-item"><span class="meta-icon">📅</span><span>Annahme: <span class="meta-value">${fmtDate(bet.closeDate)}</span></span></div>
         <div class="meta-item"><span class="meta-icon">🏁</span><span>Ende: <span class="meta-value">${fmtDate(bet.endDate)}</span></span></div>
+        ${bet.fixedOdds?`<div class="meta-item"><span class="meta-icon">📊</span><span>Quote: <span class="meta-value" style="color:var(--accent3)">${bet.fixedOdds.toFixed(2)}x</span></span></div>`:''}
         ${dn}
       </div>
       <div class="bet-bar-wrap">
@@ -557,6 +564,7 @@ window.openCreateModal = async function(){
   document.getElementById('new-bet-close').value=toInput(mc);
   document.getElementById('new-bet-end').value=toInput(me);
   document.getElementById('new-question').value='';
+  document.getElementById('new-bet-odds').value='';
   document.getElementById('create-error').textContent='';
   document.getElementById('create-overlay').classList.add('open');
 };
@@ -567,12 +575,19 @@ window.createBet = async function(){
   const q=document.getElementById('new-question').value.trim();
   const cs=document.getElementById('new-bet-close').value;
   const es=document.getElementById('new-bet-end').value;
+  const oddsRaw=document.getElementById('new-bet-odds').value.trim();
   const err=document.getElementById('create-error');
   if(!q){err.textContent='Bitte eine Frage eingeben';return;}
   if(!cs||!es){err.textContent='Bitte alle Daten ausfüllen';return;}
   const now=Date.now(),cd=new Date(cs).getTime(),ed=new Date(es).getTime();
   if(cd<now+82800000){err.textContent='Annahmeschluss muss mindestens 1 Tag in der Zukunft liegen';return;}
   if(ed<=cd){err.textContent='Enddatum muss nach dem Annahmeschluss liegen';return;}
+  let fixedOdds=null;
+  if(oddsRaw!==''){
+    fixedOdds=parseFloat(oddsRaw);
+    if(isNaN(fixedOdds)||fixedOdds<1.01){err.textContent='Wettquote muss mindestens 1.01 sein';return;}
+    fixedOdds=Math.round(fixedOdds*100)/100;
+  }
   try{
     const snap=await getDoc(doc(db,'users',currentUser));
     const u=snap.data(),today=todayStr();
@@ -582,7 +597,8 @@ window.createBet = async function(){
       question:q,creator:currentUser,createdAt:now,
       closeDate:cd,endDate:ed,resolved:false,winner:null,
       stakeYes:0,stakeNo:0,participants:{},
-      history:{[String(now)]:{yesTotal:0,noTotal:0}}
+      history:{[String(now)]:{yesTotal:0,noTotal:0}},
+      ...(fixedOdds!==null?{fixedOdds}:{})
     });
     await updateDoc(doc(db,'users',currentUser),{betsMadeToday:made+1,lastBetDate:today});
     closeCreateModal(); toast('Wette eröffnet! 🎯','success');
@@ -613,6 +629,7 @@ window.openDetailModal = function(id){
     <div class="info-row"><span class="key">Ersteller</span><span class="val">${esc(bet.creator)}</span></div>
     <div class="info-row"><span class="key">Annahme bis</span><span class="val">${fmtDate(bet.closeDate)}</span></div>
     <div class="info-row"><span class="key">Endet am</span><span class="val">${fmtDate(bet.endDate)}</span></div>
+    ${bet.fixedOdds?`<div class="info-row"><span class="key">Wettquote</span><span class="val" style="color:var(--accent3)">${bet.fixedOdds.toFixed(2)}x</span></div>`:''}
     <div class="info-row"><span class="key">Gesamteinsatz</span><span class="val">${fmtMoney(total)}</span></div>
     <div class="info-row"><span class="key">Teilnehmer</span><span class="val">${parts.length}</span></div>
     ${bet.resolved?`<div class="info-row"><span class="key">Ergebnis</span><span class="val" style="color:${bet.winner==='yes'?'var(--yes)':'var(--no)'}">
@@ -625,6 +642,9 @@ window.openDetailModal = function(id){
   document.getElementById('bet-amount').value='';
   setTxt('payout-val','— €'); setTxt('bet-error','');
   document.getElementById('det-msg-text').style.color='';
+  const oddsHint=document.getElementById('det-odds-hint');
+  if(bet.fixedOdds){oddsHint.textContent=`📊 Feste Quote: ${bet.fixedOdds.toFixed(2)}x — Gewinn = Einsatz × ${bet.fixedOdds.toFixed(2)}`;oddsHint.style.display='block';}
+  else{oddsHint.style.display='none';}
   ['det-vote-section','det-resolve-section','det-msg-section','det-delete-section'].forEach(hideEl);
 
   if(st==='open'){
@@ -680,10 +700,14 @@ window.updatePayout = function(){
   const amt=parseFloat(document.getElementById('bet-amount').value)||0;
   if(amt<=0){setTxt('payout-val','— €');return;}
   const bet=allBets.find(b=>b.id===currentDetailBetId);
-  const yT=(bet.stakeYes||0)+(selectedVote==='yes'?amt:0);
-  const nT=(bet.stakeNo||0)+(selectedVote==='no'?amt:0);
-  const tot=yT+nT,st=selectedVote==='yes'?yT:nT;
-  setTxt('payout-val',fmtMoney(st>0?(tot/st)*amt:amt));
+  if(bet.fixedOdds){
+    setTxt('payout-val',fmtMoney(Math.round(bet.fixedOdds*amt*100)/100));
+  }else{
+    const yT=(bet.stakeYes||0)+(selectedVote==='yes'?amt:0);
+    const nT=(bet.stakeNo||0)+(selectedVote==='no'?amt:0);
+    const tot=yT+nT,st=selectedVote==='yes'?yT:nT;
+    setTxt('payout-val',fmtMoney(st>0?(tot/st)*amt:amt));
+  }
 };
 
 window.placeBet = async function(){
@@ -724,7 +748,13 @@ window.resolveBet = async function(winner){
       for(const p of parts){const s=await getDoc(doc(db,'users',p.user));if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+p.amount)*100)/100});}
       toast('Keine Gewinner — Einsätze zurückerstattet.','info');
     }else{
-      for(const p of winners){const po=sw>0?(tot/sw)*p.amount:p.amount;const s=await getDoc(doc(db,'users',p.user));if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+po)*100)/100});}
+      for(const p of winners){
+        let po;
+        if(bet.fixedOdds){po=Math.round(bet.fixedOdds*p.amount*100)/100;}
+        else{po=sw>0?(tot/sw)*p.amount:p.amount;}
+        const s=await getDoc(doc(db,'users',p.user));
+        if(s.exists())await updateDoc(doc(db,'users',p.user),{balance:Math.round((s.data().balance+po)*100)/100});
+      }
       toast(`Wette aufgelöst! ${winner==='yes'?'JA':'NEIN'} gewinnt! 🎉`,'success');
     }
     closeDetailModal();
